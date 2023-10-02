@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PlaceHolder',
+      title: 'PlaceHolder ',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
