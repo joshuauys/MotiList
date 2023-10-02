@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:coolapp/utils/reset_password.dart';
-import 'package:coolapp/screens/signup_page.dart';
-import 'package:coolapp/utils/conv_color.dart';
-import 'package:coolapp/utils/reusable_widget.dart';
+import 'package:MotiList/utils/reset_password.dart';
+import 'package:MotiList/screens/signup_page.dart';
+import 'package:MotiList/utils/conv_color.dart';
+import 'package:MotiList/utils/reusable_widget.dart';
 
 import 'homepage.dart';
 
