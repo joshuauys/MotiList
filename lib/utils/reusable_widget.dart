@@ -66,3 +66,67 @@ Container firebaseUIButton(BuildContext context, String title, Function onTap) {
     ),
   );
 }
+
+class TodoItem extends StatefulWidget {
+  final String text;
+  final IconData categoryIcon;
+  final String description;
+  final DateTime date;
+
+  TodoItem({
+    required this.text,
+    required this.categoryIcon,
+    required this.description,
+    required this.date,
+  });
+
+  @override
+  _TodoItemState createState() => _TodoItemState();
+}
+
+class _TodoItemState extends State<TodoItem> {
+  bool isChecked = false;
+  bool isExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      tileColor: isChecked ? Color.fromARGB(255, 4, 209, 62) : Colors.grey,
+      leading: Checkbox(
+        value: isChecked,
+        activeColor: isChecked ? Colors.amber : Colors.black,
+        fillColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.selected)) {
+              return isChecked ? Color.fromARGB(255, 189, 9, 239) : Colors.red;
+            }
+            return Colors
+                .grey; // default color when the checkbox is not selected
+          },
+        ),
+        onChanged: (bool? value) {
+          setState(() {
+            isChecked = value!;
+          });
+        },
+      ),
+      title: Text(widget.text),
+      subtitle: isExpanded
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Description: ${widget.description}'),
+                Text('Date: ${widget.date.toLocal().toString()}'),
+              ],
+            )
+          : null,
+      trailing: Icon(widget.categoryIcon),
+      onTap: () {
+        setState(() {
+          Colors.amber;
+          isExpanded = !isExpanded;
+        });
+      },
+    );
+  }
+}
