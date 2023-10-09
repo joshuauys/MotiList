@@ -69,45 +69,54 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+          title: const Text("Be productive you GOOBER"), centerTitle: true),
       floatingActionButton: FloatingActionButton(onPressed: () {
         todoItems.add('New Todo ${todoItems.length + 1}');
         print(todoItems);
       }),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TodoItem(
-            text: 'Learn Flutter',
-            categoryIcon: Icons.school,
-            description: 'Complete the Flutter course on XYZ platform.',
-            date: DateTime.now().add(Duration(days: 2)),
-          ),
-          TodoItem(
-            text: 'Kill a group member',
-            categoryIcon: Icons.school,
-            description: 'They will never know',
-            date: DateTime.now().add(Duration(days: 2)),
-          ),
-          TodoItem(
-            text: 'Eat',
-            categoryIcon: Icons.school,
-            description: 'Complete the Flutter course on XYZ platform.',
-            date: DateTime.now().add(Duration(days: 2)),
-          ), // This includes the CheckboxExample's build output
-          Align(
-            alignment: Alignment.bottomLeft,
-            child: ElevatedButton(
-              child: Text("Logout"),
-              onPressed: () {
-                FirebaseAuth.instance.signOut().then((value) {
-                  print("Signed Out");
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => LoginPage()));
-                });
-              },
+      body: Container(
+        //alignment: Alignment.center,
+        padding: EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(5),
+        decoration: BoxDecoration(
+            color: Colors.amber, borderRadius: BorderRadius.circular(10.0)),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TodoItem(
+              text: 'Learn Flutter',
+              categoryIcon: Icons.school,
+              description: 'Complete the Flutter course on XYZ platform.',
+              date: DateTime.now().add(Duration(days: 2)),
             ),
-          ),
-        ],
+            TodoItem(
+              text: 'Kill a group member',
+              categoryIcon: Icons.school,
+              description: 'They will never know',
+              date: DateTime.now().add(Duration(days: 2)),
+            ),
+            TodoItem(
+              text: 'Eat',
+              categoryIcon: Icons.school,
+              description: 'Complete the Flutter course on XYZ platform.',
+              date: DateTime.now().add(Duration(days: 2)),
+            ),
+            Align(
+              alignment: Alignment.bottomLeft,
+              child: ElevatedButton(
+                child: const Text("Logout"),
+                onPressed: () {
+                  FirebaseAuth.instance.signOut().then((value) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => LoginPage()));
+                  });
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
