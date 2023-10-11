@@ -63,6 +63,56 @@ class _CheckboxExampleState extends State<CheckboxExample> {
   }
 }
 
+void _showAddTaskBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return Container(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize:
+              MainAxisSize.min, // Ensures only necessary space is taken
+          children: [
+            const Text('Add New Task', style: TextStyle(fontSize: 20)),
+            const SizedBox(height: 20),
+            const TextField(
+              decoration: InputDecoration(
+                labelText: 'Task Name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              WeekCheckbox(char: "M"),
+              WeekCheckbox(char: 'T'),
+              WeekCheckbox(char: 'W'),
+              WeekCheckbox(char: 'TH'),
+              WeekCheckbox(char: 'F'),
+              WeekCheckbox(char: "SA"),
+              WeekCheckbox(char: 'SU'),
+            ]),
+            const SizedBox(height: 20),
+            const TextField(
+              decoration: InputDecoration(
+                  labelText: 'Task Description',
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.all(55)),
+            ),
+            const SizedBox(height: 20),
+            const DropdownButtonExample(),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              child: const Text('Add Task'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 //This logout button should be moved to the profile page or settings
 class _HomeScreenState extends State<HomeScreen> {
   List<String> todoItems = [];
@@ -73,12 +123,13 @@ class _HomeScreenState extends State<HomeScreen> {
           title: const Text("Be productive you GOOBER"), centerTitle: true),
       floatingActionButton: FloatingActionButton(onPressed: () {
         todoItems.add('New Todo ${todoItems.length + 1}');
+        _showAddTaskBottomSheet(context);
         print(todoItems);
       }),
       body: Container(
         //alignment: Alignment.center,
-        padding: EdgeInsets.all(8.0),
-        margin: EdgeInsets.all(5),
+        padding: const EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(5),
         decoration: BoxDecoration(
             color: Colors.amber, borderRadius: BorderRadius.circular(10.0)),
         child: Column(
@@ -89,29 +140,33 @@ class _HomeScreenState extends State<HomeScreen> {
               text: 'Learn Flutter',
               categoryIcon: Icons.school,
               description: 'Complete the Flutter course on XYZ platform.',
-              date: DateTime.now().add(Duration(days: 2)),
+              date: DateTime.now().add(const Duration(days: 2)),
             ),
             TodoItem(
               text: 'Kill a group member',
               categoryIcon: Icons.school,
               description: 'They will never know',
-              date: DateTime.now().add(Duration(days: 2)),
+              date: DateTime.now().add(const Duration(days: 2)),
             ),
             TodoItem(
               text: 'Eat',
               categoryIcon: Icons.school,
               description: 'Complete the Flutter course on XYZ platform.',
-              date: DateTime.now().add(Duration(days: 2)),
+              date: DateTime.now().add(const Duration(days: 2)),
             ),
             Align(
               alignment: Alignment.bottomLeft,
               child: ElevatedButton(
                 child: const Text("Logout"),
                 onPressed: () {
-                  FirebaseAuth.instance.signOut().then((value) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => LoginPage()));
-                  });
+                  FirebaseAuth.instance.signOut().then(
+                    (value) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()));
+                    },
+                  );
                 },
               ),
             ),

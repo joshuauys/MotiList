@@ -49,11 +49,6 @@ Container firebaseUIButton(BuildContext context, String title, Function onTap) {
       onPressed: () {
         onTap();
       },
-      child: Text(
-        title,
-        style: const TextStyle(
-            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
-      ),
       style: ButtonStyle(
           backgroundColor: MaterialStateProperty.resolveWith((states) {
             if (states.contains(MaterialState.pressed)) {
@@ -63,6 +58,11 @@ Container firebaseUIButton(BuildContext context, String title, Function onTap) {
           }),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
+      child: Text(
+        title,
+        style: const TextStyle(
+            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
+      ),
     ),
   );
 }
@@ -73,7 +73,8 @@ class TodoItem extends StatefulWidget {
   final String description;
   final DateTime date;
 
-  TodoItem({
+  const TodoItem({
+    super.key,
     required this.text,
     required this.categoryIcon,
     required this.description,
@@ -127,6 +128,88 @@ class _TodoItemState extends State<TodoItem> {
           isExpanded = !isExpanded;
         });
       },
+    );
+  }
+}
+
+const List<String> list = <String>[
+  'Fitness',
+  'School',
+  'Personal',
+  'Frog-Related Hobbies'
+];
+
+class DropdownButtonExample extends StatefulWidget {
+  const DropdownButtonExample({super.key});
+
+  @override
+  State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
+}
+
+class _DropdownButtonExampleState extends State<DropdownButtonExample> {
+  String dropdownValue = list.first;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      hint: const Text("Hint Test"),
+      value: dropdownValue,
+      icon: const Icon(Icons.arrow_downward),
+      elevation: 16,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        width: 64,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? value) {
+        // This is called when the user selects an item.
+        setState(() {
+          dropdownValue = value!;
+        });
+      },
+      items: list.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+}
+
+class WeekCheckbox extends StatefulWidget {
+  String char = "X";
+  WeekCheckbox({required this.char});
+  @override
+  _WeekCheckboxState createState() => _WeekCheckboxState(char: this.char);
+}
+
+class _WeekCheckboxState extends State<WeekCheckbox> {
+  bool isChecked = false;
+  String char = "X";
+  _WeekCheckboxState({required this.char});
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: <Widget>[
+        Checkbox(
+          checkColor: Colors.blue,
+          value: isChecked,
+          onChanged: (bool? value) {
+            setState(() {
+              isChecked = value!;
+            });
+          },
+        ),
+        IgnorePointer(
+            child: Text(char,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: Colors.amber))),
+      ],
     );
   }
 }
