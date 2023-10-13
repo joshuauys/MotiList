@@ -71,14 +71,14 @@ class TodoItem extends StatefulWidget {
   final String text;
   final IconData categoryIcon;
   final String description;
-  //final DateTime date;
+  final DateTime date;
 
   const TodoItem({
     super.key,
     required this.text,
     required this.categoryIcon,
     required this.description,
-    //required this.date,
+    required this.date,
   });
 
   @override
@@ -117,7 +117,7 @@ class _TodoItemState extends State<TodoItem> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Description: ${widget.description}'),
-                //Text('Date: ${widget.date.toLocal().toString()}'),
+                Text('Date: ${widget.date.toLocal().toString()}'),
               ],
             )
           : null,
