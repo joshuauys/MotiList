@@ -1,17 +1,23 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:MotiList/utils/reusable_widget.dart';
 import 'package:MotiList/screens/login_page.dart';
 
+<<<<<<< HEAD
 List<TodoItem> todoItems = [];
+=======
+import '../models/user.dart';
+import 'login_page.dart';
+>>>>>>> 4e851a908d1cee6bc531d20c98c0ecbd7a3e2b5c
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final MyUser user;
+  const HomeScreen({Key? key, required this.user}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+<<<<<<< HEAD
 class CheckboxExampleApp extends StatelessWidget {
   const CheckboxExampleApp({super.key});
 
@@ -185,6 +191,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ],
+=======
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: ElevatedButton(
+          child: Text("Logout"),
+          onPressed: () {
+            FirebaseAuth.instance.signOut().then((value) {
+              print("Signed Out");
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LoginPage()));
+            });
+          },
+>>>>>>> 4e851a908d1cee6bc531d20c98c0ecbd7a3e2b5c
         ),
       ),
     );
