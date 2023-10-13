@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reusable_widget.dart';
 import 'package:MotiList/screens/login_page.dart';
 
+List<TodoItem> todoItems = [];
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -64,6 +66,8 @@ class _CheckboxExampleState extends State<CheckboxExample> {
 }
 
 void _showAddTaskBottomSheet(BuildContext context) {
+  final TitleController = TextEditingController();
+  final DescController = TextEditingController();
   showModalBottomSheet(
     context: context,
     builder: (context) {
@@ -75,8 +79,9 @@ void _showAddTaskBottomSheet(BuildContext context) {
           children: [
             const Text('Add New Task', style: TextStyle(fontSize: 20)),
             const SizedBox(height: 20),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: TitleController,
+              decoration: const InputDecoration(
                 labelText: 'Task Name',
                 border: OutlineInputBorder(),
               ),
@@ -91,9 +96,10 @@ void _showAddTaskBottomSheet(BuildContext context) {
               WeekCheckbox(char: 'SU'),
             ]),
             const SizedBox(height: 20),
-            const TextField(
+            TextField(
+              controller: DescController,
               decoration: InputDecoration(
-                  labelText: 'Task Description',
+                  labelText: "Description",
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.all(55)),
             ),
@@ -103,6 +109,15 @@ void _showAddTaskBottomSheet(BuildContext context) {
             ElevatedButton(
               child: const Text('Add Task'),
               onPressed: () {
+                print(TitleController.text);
+                print(DescController.text);
+                todoItems.add(
+                  TodoItem(
+                    text: TitleController.text,
+                    categoryIcon: Icons.abc,
+                    description: DescController.text,
+                  ),
+                );
                 Navigator.pop(context);
               },
             ),
@@ -115,14 +130,14 @@ void _showAddTaskBottomSheet(BuildContext context) {
 
 //This logout button should be moved to the profile page or settings
 class _HomeScreenState extends State<HomeScreen> {
-  List<String> todoItems = [];
+  //List<String> todoItems = [];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
           title: const Text("Be productive you GOOBER"), centerTitle: true),
       floatingActionButton: FloatingActionButton(onPressed: () {
-        todoItems.add('New Todo ${todoItems.length + 1}');
+        //todoItems.add('New Todo ${todoItems.length + 1}');
         _showAddTaskBottomSheet(context);
         print(todoItems);
       }),
@@ -140,19 +155,18 @@ class _HomeScreenState extends State<HomeScreen> {
               text: 'Learn Flutter',
               categoryIcon: Icons.school,
               description: 'Complete the Flutter course on XYZ platform.',
-              date: DateTime.now().add(const Duration(days: 2)),
+              //date: DateTime.now().add(const Duration(days: 2)),
             ),
             TodoItem(
               text: 'Kill a group member',
               categoryIcon: Icons.school,
               description: 'They will never know',
-              date: DateTime.now().add(const Duration(days: 2)),
             ),
             TodoItem(
               text: 'Eat',
               categoryIcon: Icons.school,
               description: 'Complete the Flutter course on XYZ platform.',
-              date: DateTime.now().add(const Duration(days: 2)),
+              //date: DateTime.now().add(const Duration(days: 2)),
             ),
             Align(
               alignment: Alignment.bottomLeft,
