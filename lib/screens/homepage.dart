@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reusable_widget.dart';
 import 'package:MotiList/screens/login_page.dart';
 
-// Import or define the TodoItem widget as well as the WeekCheckbox widget
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -23,40 +21,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Categorizing Todo items
+    Map<String, List<TodoItem>> categorizedItems = {
+      'Fitness': [],
+      'School': [],
+      'Personal': [],
+      'Frog-Related Hobbies': []
+    };
+
+    todoItems.forEach((item) {
+      categorizedItems[item.category]?.add(item);
+    });
+
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Be productive you GOOBER"), centerTitle: true),
+        title: const Text("Be productive you GOOBER"),
+        centerTitle: true,
+      ),
       floatingActionButton: FloatingActionButton(onPressed: () {
         _showAddTaskBottomSheet(context, addTodoItem);
       }),
-      body: Container(
+      body: ListView(
         padding: const EdgeInsets.all(8.0),
-        margin: const EdgeInsets.all(5),
-        decoration: BoxDecoration(
-            color: Colors.amber, borderRadius: BorderRadius.circular(10.0)),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ...todoItems,
-            Align(
-              alignment: Alignment.bottomLeft,
-              child: ElevatedButton(
-                child: const Text("Logout"),
-                onPressed: () {
-                  FirebaseAuth.instance.signOut().then(
-                    (value) {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginPage()));
-                    },
-                  );
-                },
-              ),
+        children: categorizedItems.entries.map((entry) {
+          String category = entry.key;
+          List<TodoItem> items = entry.value;
+
+          return Container(
+            padding: const EdgeInsets.all(8.0),
+            margin: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Colors.amber,
+              borderRadius: BorderRadius.circular(10.0),
             ),
-          ],
-        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  category,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                ...items,
+              ],
+            ),
+          );
+        }).toList(),
       ),
     );
   }
@@ -66,6 +75,7 @@ void _showAddTaskBottomSheet(
     BuildContext context, Function(TodoItem) addTodoItem) {
   final TitleController = TextEditingController();
   final DescController = TextEditingController();
+  String selectedCategory = list.first;
 
   showModalBottomSheet(
     context: context,
@@ -87,7 +97,6 @@ void _showAddTaskBottomSheet(
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Ensure you have the WeekCheckbox widget defined elsewhere
                 WeekCheckbox(char: "M"),
                 WeekCheckbox(char: 'T'),
                 WeekCheckbox(char: 'W'),
@@ -105,17 +114,25 @@ void _showAddTaskBottomSheet(
                   border: OutlineInputBorder(),
                   contentPadding: EdgeInsets.all(55)),
             ),
+            //return value from DropdownButtonExample()
+
             const SizedBox(height: 20),
-            // Ensure you have the DropdownButtonExample widget defined elsewhere
-            const DropdownButtonExample(),
+            DropdownButtonExample(
+              onValueChanged: (newValue) {
+                selectedCategory = newValue;
+              },
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               child: const Text('Add Task'),
               onPressed: () {
+                //return category based on DropdownButtomExample value
+
                 final newItem = TodoItem(
                   text: TitleController.text,
                   categoryIcon: Icons.abc,
                   description: DescController.text,
+                  category: selectedCategory,
                 );
                 addTodoItem(newItem);
                 Navigator.pop(context);

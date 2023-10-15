@@ -71,15 +71,17 @@ class TodoItem extends StatefulWidget {
   final String text;
   final IconData categoryIcon;
   final String description;
+  final String category;
   //final DateTime date;
 
-  const TodoItem({
-    super.key,
-    required this.text,
-    required this.categoryIcon,
-    required this.description,
-    //required this.date,
-  });
+  const TodoItem(
+      {super.key,
+      required this.text,
+      required this.categoryIcon,
+      required this.description,
+      required this.category
+      //required this.date,
+      });
 
   @override
   _TodoItemState createState() => _TodoItemState();
@@ -140,7 +142,11 @@ const List<String> list = <String>[
 ];
 
 class DropdownButtonExample extends StatefulWidget {
-  const DropdownButtonExample({super.key});
+  final ValueChanged<String> onValueChanged; // Added a callback
+  const DropdownButtonExample({
+    Key? key,
+    required this.onValueChanged, // Marked as required
+  }) : super(key: key);
 
   @override
   State<DropdownButtonExample> createState() => _DropdownButtonExampleState();
@@ -162,11 +168,11 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
         width: 64,
         color: Colors.deepPurpleAccent,
       ),
-      onChanged: (String? value) {
-        // This is called when the user selects an item.
+      onChanged: (String? newValue) {
         setState(() {
-          dropdownValue = value!;
+          dropdownValue = newValue!;
         });
+        widget.onValueChanged(dropdownValue); // Notify about the change
       },
       items: list.map<DropdownMenuItem<String>>((String value) {
         return DropdownMenuItem<String>(
