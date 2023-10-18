@@ -88,7 +88,8 @@ class TodoItem extends StatefulWidget {
   _TodoItemState createState() => _TodoItemState();
 }
 
-class _TodoItemState extends State<TodoItem> {
+class _TodoItemState extends State<TodoItem>
+    with SingleTickerProviderStateMixin {
   bool isChecked = false;
   bool isExpanded = false;
 
@@ -202,16 +203,20 @@ class _TodoItemState extends State<TodoItem> {
             },
           ),
           title: Text(widget.text),
-          subtitle: isExpanded
-              ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Description: ${widget.description}'),
-                    // Uncomment the below line to display the date.
-                    //Text('Date: ${widget.date.toLocal().toString()}'),
-                  ],
-                )
-              : null,
+          subtitle: AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            //vsync: this,
+            child: isExpanded
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Description: ${widget.description}'),
+                      // Uncomment the below line to display the date.
+                      //Text('Date: ${widget.date.toLocal().toString()}'),
+                    ],
+                  )
+                : null,
+          ),
           trailing: Icon(widget.categoryIcon),
           onTap: () {
             setState(() {

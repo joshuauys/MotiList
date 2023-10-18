@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reusable_widget.dart';
 import 'package:MotiList/screens/login_page.dart';
 import 'package:intl/intl.dart';
+import 'profile.dart';
 
 // A stateful widget representing the home screen of the app.
 class HomeScreen extends StatefulWidget {
@@ -89,6 +90,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
+            },
+            icon: const Icon(Icons.person),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -112,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         child: ListView(
           padding: const EdgeInsets.all(8.0),
-          //Each category in categorizedItems is mapped to its own container
+          //Each category in categorizedItems is mapped to its own Container
           children: categorizedItems.entries.map((entry) {
             String category = entry.key;
             List<TodoItem> items = entry.value;
@@ -132,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  ...items, //Each TodoItem in items is mapped to its own container
+                  ...items, //Each TodoItem in items is mapped to its own Container
                 ],
               ),
             );
