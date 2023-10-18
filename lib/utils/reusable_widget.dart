@@ -160,7 +160,7 @@ class _TodoItemState extends State<TodoItem> {
 
   @override
   Widget build(BuildContext context) {
-    //Swipe in order to delete atask
+    //Swipe a task in order to delete it
     return Dismissible(
       key: UniqueKey(),
       secondaryBackground: Container(color: Colors.red),
@@ -176,7 +176,8 @@ class _TodoItemState extends State<TodoItem> {
           _editCurrentItem(); // Call the edit function on long press.
         },
         child: ListTile(
-          tileColor: isChecked ? Color.fromARGB(255, 4, 209, 62) : Colors.grey,
+          tileColor:
+              isChecked ? const Color.fromARGB(255, 4, 209, 62) : Colors.grey,
           leading: Checkbox(
             value: isChecked,
             activeColor: isChecked ? Colors.amber : Colors.black,
@@ -242,7 +243,6 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<String>(
-      hint: const Text("Hint Test"),
       value: dropdownValue,
       icon: const Icon(Icons.arrow_downward),
       elevation: 16,
@@ -276,6 +276,7 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
 class WeekCheckbox extends StatefulWidget {
   String char = "X";
   WeekCheckbox({required this.char});
+
   @override
   _WeekCheckboxState createState() => _WeekCheckboxState(char: this.char);
 }

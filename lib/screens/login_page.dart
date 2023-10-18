@@ -17,6 +17,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   TextEditingController _passwordTextController = TextEditingController();
   TextEditingController _emailTextController = TextEditingController();
+  String _errorMessage = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,7 +32,14 @@ class _LoginPageState extends State<LoginPage> {
         ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
         child: Column(
           children: <Widget>[
-            logoWidget("assets/logo.png"),
+            //Add image from "assets/Dog.jpg"
+            const SizedBox(
+              height: 30,
+            ),
+            const Image(
+                image: AssetImage("assets/App Icon.jpeg"),
+                height: 101,
+                width: 101),
             const SizedBox(
               height: 30,
             ),
@@ -45,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 5,
             ),
+            //Text("data"),
             forgetPassword(context),
             firebaseUIButton(context, "Sign In", () {
               FirebaseAuth.instance
@@ -54,11 +63,41 @@ class _LoginPageState extends State<LoginPage> {
                   .then((value) {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => HomeScreen()));
-              }).onError((error, stackTrace) {
-                print("Error ${error.toString()}");
+              }).catchError((error) {
+                switch (error.code) {
+                  case "invalid-email":
+                    setState(() {
+                      _errorMessage =
+                          "Your email address is not formated correctly.";
+                    });
+                    break;
+                  case "user-disabled":
+                    setState(() {
+                      _errorMessage = "Your account has been disabled.";
+                    });
+                    break;
+                  case "user-not-found":
+                    setState(() {
+                      _errorMessage = "User with this email doesn't exist.";
+                    });
+                    break;
+                  case "wrong-password":
+                    setState(() {
+                      _errorMessage = "Invalid password.";
+                    });
+                    break;
+                  default:
+                    setState(() {
+                      _errorMessage = "Error ${error.toString()}";
+                    });
+                }
               });
             }),
-            signUpOption()
+            signUpOption(),
+            Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red),
+            )
           ],
         ),
       ),
