@@ -1,3 +1,4 @@
+import 'package:MotiList/screens/homepage.dart';
 import 'package:flutter/material.dart';
 
 Image logoWidget(String imageName) {
@@ -72,16 +73,16 @@ class TodoItem extends StatefulWidget {
   final IconData categoryIcon;
   final String description;
   final String category;
-  //final DateTime date;
+  final Function(String, String) onItemUpdated; // Added callback
 
-  const TodoItem(
-      {super.key,
-      required this.text,
-      required this.categoryIcon,
-      required this.description,
-      required this.category
-      //required this.date,
-      });
+  const TodoItem({
+    Key? key,
+    required this.text,
+    required this.categoryIcon,
+    required this.description,
+    required this.category,
+    required this.onItemUpdated, // Initialize in constructor
+  }) : super(key: key);
 
   @override
   _TodoItemState createState() => _TodoItemState();
@@ -91,55 +92,138 @@ class _TodoItemState extends State<TodoItem> {
   bool isChecked = false;
   bool isExpanded = false;
 
+  void _editCurrentItem() async {
+    // Retrieving current values.
+    final currentText = widget.text;
+    final currentDescription = widget.description;
+
+    // This will hold the new values.
+    String newText = '';
+    String newDescription = '';
+
+    // Here, we pop up a dialog to edit the item.
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Task'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // To make the card compact
+            children: <Widget>[
+              TextField(
+                autofocus: true,
+                decoration: const InputDecoration(
+                    labelText: 'Task', hintText: 'Enter task name'),
+                controller: TextEditingController(text: currentText),
+                onChanged: (value) {
+                  newText =
+                      value; // When the text changes, update the new value.
+                },
+              ),
+              TextField(
+                decoration: const InputDecoration(
+                    labelText: 'Description', hintText: 'Enter description'),
+                controller: TextEditingController(text: currentDescription),
+                onChanged: (value) {
+                  newDescription =
+                      value; // Update the new description similarly.
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Dismiss the dialog when cancel is pressed
+              },
+            ),
+            TextButton(
+              child: Text('Save'),
+              onPressed: () {
+                if (newText.isNotEmpty && newDescription.isNotEmpty) {
+                  // Checking if values are valid
+                  // We update the task through the callback.
+                  widget.onItemUpdated(newText, newDescription);
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                } else {
+                  // You might want to handle the error, or show a warning that fields can't be empty
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      tileColor: isChecked ? Color.fromARGB(255, 4, 209, 62) : Colors.grey,
-      leading: Checkbox(
-        value: isChecked,
-        activeColor: isChecked ? Colors.amber : Colors.black,
-        fillColor: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.selected)) {
-              return isChecked ? Color.fromARGB(255, 189, 9, 239) : Colors.red;
-            }
-            return Colors
-                .grey; // default color when the checkbox is not selected
+    //Swipe in order to delete atask
+    return Dismissible(
+      key: UniqueKey(),
+      secondaryBackground: Container(color: Colors.red),
+      background: Container(color: Colors.green),
+      direction: DismissDirection.horizontal,
+      onDismissed: (_) {
+        print("Item dismissed.");
+        // Call the delete function when the task is dismissed.
+        //widget.onItemDeleted();
+      },
+      child: GestureDetector(
+        onLongPress: () {
+          _editCurrentItem(); // Call the edit function on long press.
+        },
+        child: ListTile(
+          tileColor: isChecked ? Color.fromARGB(255, 4, 209, 62) : Colors.grey,
+          leading: Checkbox(
+            value: isChecked,
+            activeColor: isChecked ? Colors.amber : Colors.black,
+            fillColor: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.selected)) {
+                  return isChecked
+                      ? Color.fromARGB(255, 189, 9, 239)
+                      : Colors.red;
+                }
+                return Colors.grey; // Use default color when not selected
+              },
+            ),
+            onChanged: (bool? value) {
+              setState(() {
+                isChecked = value!;
+                TextStyle(
+                    decoration: isChecked
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none);
+              });
+            },
+          ),
+          title: Text(widget.text),
+          subtitle: isExpanded
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Description: ${widget.description}'),
+                    // Uncomment the below line to display the date.
+                    //Text('Date: ${widget.date.toLocal().toString()}'),
+                  ],
+                )
+              : null,
+          trailing: Icon(widget.categoryIcon),
+          onTap: () {
+            setState(() {
+              isExpanded = !isExpanded;
+            });
           },
         ),
-        onChanged: (bool? value) {
-          setState(() {
-            isChecked = value!;
-          });
-        },
       ),
-      title: Text(widget.text),
-      subtitle: isExpanded
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Description: ${widget.description}'),
-                //Text('Date: ${widget.date.toLocal().toString()}'),
-              ],
-            )
-          : null,
-      trailing: Icon(widget.categoryIcon),
-      onTap: () {
-        setState(() {
-          Colors.amber;
-          isExpanded = !isExpanded;
-        });
-      },
     );
   }
 }
 
-const List<String> list = <String>[
-  'Fitness',
-  'School',
-  'Personal',
-  'Frog-Related Hobbies'
-];
+const List<String> list = <String>['Fitness', 'School', 'Personal', 'Work'];
 
 class DropdownButtonExample extends StatefulWidget {
   final ValueChanged<String> onValueChanged; // Added a callback
@@ -169,21 +253,26 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
         color: Colors.deepPurpleAccent,
       ),
       onChanged: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-        });
+        setState(
+          () {
+            dropdownValue = newValue!;
+          },
+        );
         widget.onValueChanged(dropdownValue); // Notify about the change
       },
-      items: list.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
+      items: list.map<DropdownMenuItem<String>>(
+        (String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        },
+      ).toList(),
     );
   }
 }
 
+//Checkbox Class for users to select what days they want to be reminded
 class WeekCheckbox extends StatefulWidget {
   String char = "X";
   WeekCheckbox({required this.char});
@@ -204,17 +293,22 @@ class _WeekCheckboxState extends State<WeekCheckbox> {
           checkColor: Colors.blue,
           value: isChecked,
           onChanged: (bool? value) {
-            setState(() {
-              isChecked = value!;
-            });
+            setState(
+              () {
+                isChecked = value!;
+              },
+            );
           },
         ),
+
+        //Prevents the user from clicking on the text thats over the checkbox
         IgnorePointer(
-            child: Text(char,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Colors.amber))),
+          child: Text(
+            char,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 14, color: Colors.amber),
+          ),
+        ),
       ],
     );
   }
