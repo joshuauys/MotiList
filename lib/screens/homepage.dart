@@ -13,6 +13,19 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Your Application Title',
+      theme: ThemeData(
+        primarySwatch: Colors.blue, // Feel free to adjust this color
+      ),
+      home: HomeScreen(), // Setting your HomeScreen as the root of your app.
+    );
+  }
+}
+
 //HomeScreen state, contain all the relevent variables and UI for the home screen
 class _HomeScreenState extends State<HomeScreen> {
   final List<TodoItem> todoItems = [];
@@ -196,7 +209,10 @@ void _showAddTaskBottomSheet(
                   onValueChanged: (newValue) {
                     selectedCategory = newValue;
                     // Update the state of the modal to reflect the new category
-                    setModalState(() {});
+                    setModalState(() {
+                      titleController.dispose();
+                      descController.dispose();
+                    });
                   },
                 ),
                 const SizedBox(height: 20),

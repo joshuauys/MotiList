@@ -319,3 +319,118 @@ class _WeekCheckboxState extends State<WeekCheckbox> {
     );
   }
 }
+
+class Leaderboard extends StatefulWidget {
+  final String text;
+  final IconData categoryIcon;
+  final String description;
+  final String category;
+
+  const Leaderboard({
+    Key? key,
+    required this.text,
+    required this.categoryIcon,
+    required this.description,
+    required this.category,
+  }) : super(key: key);
+
+  @override
+  _LeaderboardState createState() => _LeaderboardState();
+}
+
+class _LeaderboardState extends State<TodoItem> {
+  bool isExpanded = false;
+
+  void _editCurrentItem() async {
+    // Retrieving current values.
+    final currentText = widget.text;
+    final currentDescription = widget.description;
+
+    // This will hold the new values.
+    String newText = '';
+    String newDescription = '';
+
+    // Here, we pop up a dialog to edit the item.
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Task'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min, // To make the card compact
+            children: <Widget>[
+              TextField(
+                autofocus: true,
+                decoration: const InputDecoration(
+                    labelText: 'Task', hintText: 'Enter task name'),
+                controller: TextEditingController(text: currentText),
+                onChanged: (value) {
+                  newText =
+                      value; // When the text changes, update the new value.
+                },
+              ),
+              TextField(
+                decoration: const InputDecoration(
+                    labelText: 'Description', hintText: 'Enter description'),
+                controller: TextEditingController(text: currentDescription),
+                onChanged: (value) {
+                  newDescription =
+                      value; // Update the new description similarly.
+                },
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context)
+                    .pop(); // Dismiss the dialog when cancel is pressed
+              },
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                if (newText.isNotEmpty && newDescription.isNotEmpty) {
+                  // Checking if values are valid
+                  // We update the task through the callback.
+                  widget.onItemUpdated(newText, newDescription);
+                  Navigator.of(context).pop(); // Dismiss the dialog
+                } else {
+                  // You might want to handle the error, or show a warning that fields can't be empty
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //Swipe a task in order to delete it
+    return Dismissible(
+      key: UniqueKey(),
+      secondaryBackground: Container(color: Colors.red),
+      background: Container(color: Colors.green),
+      direction: DismissDirection.horizontal,
+      onDismissed: (_) {
+        print("Item dismissed.");
+        // Call the delete function when the task is dismissed.
+        //widget.onItemDeleted();
+      },
+      child: GestureDetector(
+        onLongPress: () {
+          _editCurrentItem(); // Call the edit function on long press.
+        },
+        child: ListTile(),
+        onTap: () {
+          setState(() {
+            isExpanded = !isExpanded;
+          });
+        },
+      ),
+    );
+  }
+}

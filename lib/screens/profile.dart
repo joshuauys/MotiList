@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() {
   runApp(ProfileScreen());
@@ -8,36 +7,17 @@ void main() {
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MyListView(),
-    );
+    return MyListView();
   }
 }
 
 class MyListView extends StatelessWidget {
   // const MyApp({super.key});
 
-  Future<String> getUsername(String userId) async {
-    DocumentSnapshot doc =
-        await FirebaseFirestore.instance.collection('users').doc(userId).get();
-
-    // Check for null before accessing the data
-    if (doc.data() == null) {
-      return '';
-    }
-
-    // Cast the data to a Map<String, dynamic> before usage
-    Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
-
-    // Safely access the username field
-    return data['username'] ??
-        ''; // returns the username if it exists, otherwise an empty string
-  }
-
   final List<Map<String, dynamic>> items = [
     {
       'type': 'text',
-      'data': 'Username',
+      'data': 'Joshua Uys',
     },
     {
       'type': 'image',
@@ -62,7 +42,13 @@ class MyListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: Text('Profile'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: items.length,
@@ -74,7 +60,7 @@ class MyListView extends StatelessWidget {
               title: Center(
                 child: Text(
                   item['data'],
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20.0, // Adjust the font size as needed
                     fontWeight:
                         FontWeight.bold, // Adjust the font weight as needed
@@ -117,7 +103,7 @@ class MyListView extends StatelessWidget {
             );
           }
 
-          return const SizedBox(); // Return an empty container for unknown types.
+          return SizedBox(); // Return an empty container for unknown types.
         },
       ),
       floatingActionButton: FloatingActionButton(
