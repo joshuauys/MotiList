@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
             reusableTextField("Enter Email", Icons.person_outline, false,
                 _emailTextController),
             const SizedBox(
-              height: 20,
+              height: 10,
             ),
             reusableTextField("Enter Password", Icons.lock_outline, true,
                 _passwordTextController),

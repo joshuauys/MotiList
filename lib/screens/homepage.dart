@@ -209,15 +209,12 @@ void _showAddTaskBottomSheet(
                   onValueChanged: (newValue) {
                     selectedCategory = newValue;
                     // Update the state of the modal to reflect the new category
-                    setModalState(() {
-                      titleController.dispose();
-                      descController.dispose();
-                    });
+                    setModalState(() {});
                   },
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 9),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     WeekCheckbox(char: "S"),
                     WeekCheckbox(char: "M"),
@@ -228,7 +225,7 @@ void _showAddTaskBottomSheet(
                     WeekCheckbox(char: "S"),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 0),
                 Text(errortext, style: const TextStyle(color: Colors.red)),
                 ElevatedButton(
                   onPressed: () {

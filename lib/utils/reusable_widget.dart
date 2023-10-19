@@ -320,115 +320,74 @@ class _WeekCheckboxState extends State<WeekCheckbox> {
   }
 }
 
-class Leaderboard extends StatefulWidget {
-  final String text;
-  final IconData categoryIcon;
-  final String description;
-  final String category;
+// A single leaderboard item representing each user's data.
+class LeaderboardItem extends StatelessWidget {
+  final String imageUrl;
+  final String name;
+  final int points;
 
-  const Leaderboard({
+  const LeaderboardItem({
     Key? key,
-    required this.text,
-    required this.categoryIcon,
-    required this.description,
-    required this.category,
+    required this.imageUrl,
+    required this.name,
+    required this.points,
   }) : super(key: key);
 
   @override
-  _LeaderboardState createState() => _LeaderboardState();
-}
-
-class _LeaderboardState extends State<TodoItem> {
-  bool isExpanded = false;
-
-  void _editCurrentItem() async {
-    // Retrieving current values.
-    final currentText = widget.text;
-    final currentDescription = widget.description;
-
-    // This will hold the new values.
-    String newText = '';
-    String newDescription = '';
-
-    // Here, we pop up a dialog to edit the item.
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Task'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min, // To make the card compact
-            children: <Widget>[
-              TextField(
-                autofocus: true,
-                decoration: const InputDecoration(
-                    labelText: 'Task', hintText: 'Enter task name'),
-                controller: TextEditingController(text: currentText),
-                onChanged: (value) {
-                  newText =
-                      value; // When the text changes, update the new value.
-                },
-              ),
-              TextField(
-                decoration: const InputDecoration(
-                    labelText: 'Description', hintText: 'Enter description'),
-                controller: TextEditingController(text: currentDescription),
-                onChanged: (value) {
-                  newDescription =
-                      value; // Update the new description similarly.
-                },
-              ),
-            ],
+  Widget build(BuildContext context) {
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        children: <Widget>[
+          // The circular image.
+          CircleAvatar(
+            backgroundImage: NetworkImage(imageUrl),
+            radius: 30.0, // You can adjust the size of the avatar as required.
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context)
-                    .pop(); // Dismiss the dialog when cancel is pressed
-              },
+          const SizedBox(
+              width: 15.0), // Some spacing between the picture and the text.
+          // User's name and points.
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontSize: 18.0, // Adjust your size as needed.
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '$points pts',
+                  style: TextStyle(
+                    fontSize: 16.0, // Adjust your size as needed.
+                    color: Colors.grey[
+                        600], // You can choose the appropriate color for your design.
+                  ),
+                ),
+              ],
             ),
-            TextButton(
-              child: const Text('Save'),
-              onPressed: () {
-                if (newText.isNotEmpty && newDescription.isNotEmpty) {
-                  // Checking if values are valid
-                  // We update the task through the callback.
-                  widget.onItemUpdated(newText, newDescription);
-                  Navigator.of(context).pop(); // Dismiss the dialog
-                } else {
-                  // You might want to handle the error, or show a warning that fields can't be empty
-                }
-              },
-            ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
     );
   }
+}
+
+// The entire leaderboard widget.
+class Leaderboard extends StatelessWidget {
+  final List<LeaderboardItem> items;
+
+  const Leaderboard({Key? key, required this.items}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    //Swipe a task in order to delete it
-    return Dismissible(
-      key: UniqueKey(),
-      secondaryBackground: Container(color: Colors.red),
-      background: Container(color: Colors.green),
-      direction: DismissDirection.horizontal,
-      onDismissed: (_) {
-        print("Item dismissed.");
-        // Call the delete function when the task is dismissed.
-        //widget.onItemDeleted();
-      },
-      child: GestureDetector(
-        onLongPress: () {
-          _editCurrentItem(); // Call the edit function on long press.
-        },
-        child: ListTile(),
-        onTap: () {
-          setState(() {
-            isExpanded = !isExpanded;
-          });
+    return Container(
+      child: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return items[index];
         },
       ),
     );

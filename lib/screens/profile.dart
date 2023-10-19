@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:MotiList/utils/reusable_widget.dart';
 
 void main() {
   runApp(ProfileScreen());
@@ -7,13 +8,11 @@ void main() {
 class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MyListView();
+    return MyProfileView();
   }
 }
 
-class MyListView extends StatelessWidget {
-  // const MyApp({super.key});
-
+class MyProfileView extends StatelessWidget {
   final List<Map<String, dynamic>> items = [
     {
       'type': 'text',
@@ -35,107 +34,173 @@ class MyListView extends StatelessWidget {
     },
     // Add more items as needed
   ];
-
-  static get images => null;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
       ),
-      body: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
 
-          if (item['type'] == 'text') {
-            return ListTile(
-              title: Center(
-                child: Text(
-                  item['data'],
+                if (item['type'] == 'text') {
+                  return ListTile(
+                    title: Center(
+                      child: Text(
+                        item['data'],
+                        style: const TextStyle(
+                          fontSize: 20.0, // Adjust the font size as needed
+                          fontWeight: FontWeight
+                              .bold, // Adjust the font weight as needed
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                } else if (item['type'] == 'image') {
+                  return ListTile(
+                    title: ClipOval(
+                      child: Container(
+                        width: 150.0, // Adjust the size as needed
+                        height: 150.0, // Adjust the size as needed
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.fitHeight,
+                            image: NetworkImage(item['data']),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                } else if (item['type'] == 'picture') {
+                  return ListTile(
+                    title: ClipOval(
+                      child: Container(
+                        width: 50.0, // Adjust the size as needed
+                        height: 50.0, // Adjust the size as needed
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.fitHeight,
+                            image: NetworkImage(item['data']),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                return ListTile(
+                    // Depending on your item type, return appropriate widgets
+                    );
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Leaderboard',
                   style: TextStyle(
-                    fontSize: 20.0, // Adjust the font size as needed
-                    fontWeight:
-                        FontWeight.bold, // Adjust the font weight as needed
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          } else if (item['type'] == 'image') {
-            return ListTile(
-              title: ClipOval(
-                child: Container(
-                  width: 150.0, // Adjust the size as needed
-                  height: 150.0, // Adjust the size as needed
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      fit: BoxFit.fitHeight,
-                      image: NetworkImage(item['data']),
-                    ),
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            );
-          } else if (item['type'] == 'picture') {
-            return ListTile(
-              title: ClipOval(
-                child: Container(
-                  width: 50.0, // Adjust the size as needed
-                  height: 50.0, // Adjust the size as needed
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      fit: BoxFit.fitHeight,
-                      image: NetworkImage(item['data']),
-                    ),
-                  ),
+                LeaderboardItem(
+                  imageUrl: 'assets/Thumbs2.jpg',
+                  name: 'TaskLover25',
+                  points: 100,
                 ),
-              ),
-            );
-          }
-
-          return SizedBox(); // Return an empty container for unknown types.
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        // onPressed: () => setState(() => _count++),
-        tooltip: 'Increment Counter',
-        onPressed: () {},
-        child: const Icon(Icons.search),
+                LeaderboardItem(
+                  imageUrl: 'assets/Thumbs.jpg',
+                  name: 'DopamineDad',
+                  points: 200,
+                ),
+                LeaderboardItem(
+                  imageUrl: 'assets/Dog3.jpg',
+                  name: 'LoveMeSomeTasks',
+                  points: 150,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
-    // Horizontal Scroll View
-    Container(
-      height: 120, // Set the desired height
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          // Add your horizontally scrolling items here
-          // For example:
-          Container(
-            width: 120, // Set the desired width
-            color: Colors.blue,
-            margin: EdgeInsets.all(10.0),
-            alignment: Alignment.center,
-            child: Text('Item 1'),
+  }
+}
+
+class LeaderboardItem extends StatelessWidget {
+  final String imageUrl;
+  final String name;
+  final int points;
+
+  const LeaderboardItem({
+    Key? key,
+    required this.imageUrl,
+    required this.name,
+    required this.points,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.5),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3), // changes position of shadow
           ),
-          Container(
-            width: 120, // Set the desired width
-            color: Colors.green,
-            margin: EdgeInsets.all(10.0),
-            alignment: Alignment.center,
-            child: Text('Item 2'),
+        ],
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 30.0,
+            backgroundImage: NetworkImage(imageUrl),
           ),
-          // Add more items as needed
+          const SizedBox(width: 12.0),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '$points points',
+                  style: TextStyle(
+                    fontSize: 14.0,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
