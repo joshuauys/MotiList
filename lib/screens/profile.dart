@@ -117,7 +117,7 @@ class MyListView extends StatelessWidget {
             );
           }
 
-          return SizedBox(); // Return an empty container for unknown types.
+          return const SizedBox(); // Return an empty container for unknown types.
         },
       ),
       floatingActionButton: FloatingActionButton(

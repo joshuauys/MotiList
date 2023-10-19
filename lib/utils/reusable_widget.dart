@@ -134,14 +134,14 @@ class _TodoItemState extends State<TodoItem>
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context)
                     .pop(); // Dismiss the dialog when cancel is pressed
               },
             ),
             TextButton(
-              child: Text('Save'),
+              child: const Text('Save'),
               onPressed: () {
                 if (newText.isNotEmpty && newDescription.isNotEmpty) {
                   // Checking if values are valid
@@ -204,7 +204,7 @@ class _TodoItemState extends State<TodoItem>
           ),
           title: Text(widget.text),
           subtitle: AnimatedSize(
-            duration: const Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 3300),
             //vsync: this,
             child: isExpanded
                 ? Column(
