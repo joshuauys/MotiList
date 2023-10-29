@@ -1,9 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reusable_widget.dart';
-import 'package:MotiList/screens/login_page.dart';
 import 'package:intl/intl.dart';
 import 'profile.dart';
+import 'package:provider/provider.dart';
 
 // A stateful widget representing the home screen of the app.
 class HomeScreen extends StatefulWidget {
@@ -32,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> {
   var formattedDate = DateFormat('EEEE dd').format(DateTime.now());
   var dayOffset = 0;
 
+  List<TodoItem> get getTodoItems => todoItems;
+
   //Returns the formatted week-date for the appbar (e.g. Monday 15)
   set updateFormattedDate(DateTime date) {
     var formatter = DateFormat('EEEE dd');
@@ -44,20 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void addTodoItem(TodoItem item) {
     setState(() {
       todoItems.add(item);
-    });
-  }
-
-  //Updates build to remove TodoItem from the list
-  void removeTodoItem(int index) {
-    setState(() {
-      todoItems.removeAt(index);
-    });
-  }
-
-  //Updates build to edit TodoItem in the list
-  void editTodoItem(int index, TodoItem newItem) {
-    setState(() {
-      todoItems[index] = newItem; // Update the item at the given index
     });
   }
 
@@ -74,6 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final todoProvider = Provider.of<TodoProvider>(context);
+    List<TodoItem> todoList = todoProvider.getTodoItems;
+
     // Categorizing Todo items
     Map<String, List<TodoItem>> categorizedItems = {
       'Fitness': [],
@@ -88,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'Personal': const Color.fromARGB(255, 76, 175, 80),
       'Work': const Color.fromARGB(255, 33, 150, 243),
     };
-    todoItems.forEach((item) {
+    todoList.forEach((item) {
       categorizedItems[item.category]?.add(item);
     });
 
@@ -235,9 +226,12 @@ void _showAddTaskBottomSheet(
                           Icons.category, // change this icon as needed
                       description: descController.text,
                       category: selectedCategory,
-                      onItemUpdated: (newText, newDescription) {},
+
+                      //onItemUpdated: (newText, newDescription) {},
                     );
                     if (newItem.text.isNotEmpty) {
+                      Provider.of<TodoProvider>(context, listen: false)
+                          .addTodoItem(newItem);
                       addTodoItem(newItem);
                       Navigator.of(context).pop(); // Close the bottom sheet
                     } else {

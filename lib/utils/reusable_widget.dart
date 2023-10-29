@@ -1,5 +1,6 @@
-import 'package:MotiList/screens/homepage.dart';
+//import 'package:MotiList/screens/homepage.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 Image logoWidget(String imageName) {
   return Image.asset(
@@ -68,20 +69,46 @@ Container firebaseUIButton(BuildContext context, String title, Function onTap) {
   );
 }
 
+class TodoProvider extends ChangeNotifier {
+  List<TodoItem> todoItems = [];
+
+  List<TodoItem> get getTodoItems => todoItems;
+  List<TodoItem> get getTodoItemsLength => todoItems;
+
+  void addTodoItem(TodoItem todoItem) {
+    todoItems.add(todoItem);
+    //print(todoItems.length.toString());
+    notifyListeners();
+  }
+
+  void deleteTodoItem(TodoItem todoItem) {
+    todoItems.remove(todoItem);
+    notifyListeners();
+  }
+
+  void updateTodoItem(TodoItem oldTodoItem, TodoItem newTodoItem) {
+    final index = todoItems.indexOf(oldTodoItem);
+    todoItems[0] = newTodoItem;
+    notifyListeners();
+  }
+}
+
 class TodoItem extends StatefulWidget {
   final String text;
   final IconData categoryIcon;
   final String description;
   final String category;
-  final Function(String, String) onItemUpdated; // Added callback
 
-  const TodoItem({
+  //Function(String, String) onItemUpdated; // Added callback
+
+  TodoItem({
     Key? key,
     required this.text,
     required this.categoryIcon,
     required this.description,
     required this.category,
-    required this.onItemUpdated, // Initialize in constructor
+
+    //required this.onItemUpdated, // Initialize in constructor
   }) : super(key: key);
 
   @override
@@ -94,6 +121,12 @@ class _TodoItemState extends State<TodoItem>
   bool isExpanded = false;
 
   void _editCurrentItem() async {
+    final oldItem = TodoItem(
+      text: widget.text,
+      categoryIcon: Icons.category, // change this icon as needed
+      description: widget.description,
+      category: "Fitness",
+    );
     // Retrieving current values.
     final currentText = widget.text;
     final currentDescription = widget.description;
@@ -143,11 +176,19 @@ class _TodoItemState extends State<TodoItem>
             TextButton(
               child: const Text('Save'),
               onPressed: () {
-                if (newText.isNotEmpty && newDescription.isNotEmpty) {
+                final newItem = TodoItem(
+                  text: widget.text,
+                  categoryIcon: Icons.category, // change this icon as needed
+                  description: widget.description,
+                  category: "Fitness",
+                );
+                if (newText.isNotEmpty || newDescription.isNotEmpty) {
                   // Checking if values are valid
                   // We update the task through the callback.
-                  widget.onItemUpdated(newText, newDescription);
+                  Provider.of<TodoProvider>(context, listen: false)
+                      .updateTodoItem(oldItem, newItem);
                   Navigator.of(context).pop(); // Dismiss the dialog
+                  //widget.onItemUpdated(newText, newDescription);
                 } else {
                   // You might want to handle the error, or show a warning that fields can't be empty
                 }
@@ -280,7 +321,7 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
 //Checkbox Class for users to select what days they want to be reminded
 class WeekCheckbox extends StatefulWidget {
   String char = "X";
-  WeekCheckbox({required this.char});
+  WeekCheckbox({super.key, required this.char});
 
   @override
   _WeekCheckboxState createState() => _WeekCheckboxState(char: this.char);
@@ -336,7 +377,7 @@ class LeaderboardItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.0),
+      margin: const EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
         children: <Widget>[
           // The circular image.
