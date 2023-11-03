@@ -86,9 +86,13 @@ class TodoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTodoItem(TodoItem oldTodoItem, TodoItem newTodoItem) {
-    final index = todoItems.indexOf(oldTodoItem);
-    todoItems[0] = newTodoItem;
+  void updateTodoItem(TodoItem oldTodoItem, String name, TodoItem newTodoItem) {
+    final index =
+        todoItems.indexWhere((todoItems) => todoItems.text == oldTodoItem.text);
+    //final index = todoItems.indexOf(oldTodoItem);
+    todoItems[index] = newTodoItem;
+    print(newTodoItem.text);
+    print(index);
     notifyListeners();
   }
 }
@@ -98,8 +102,6 @@ class TodoItem extends StatefulWidget {
   final IconData categoryIcon;
   final String description;
   final String category;
-
-  //Function(String, String) onItemUpdated; // Added callback
 
   TodoItem({
     Key? key,
@@ -125,17 +127,19 @@ class _TodoItemState extends State<TodoItem>
       text: widget.text,
       categoryIcon: Icons.category, // change this icon as needed
       description: widget.description,
-      category: "Fitness",
+      category: widget.category,
     );
     // Retrieving current values.
     final currentText = widget.text;
     final currentDescription = widget.description;
 
+    String newSelectedCategory = widget.category;
+
     // This will hold the new values.
     String newText = '';
     String newDescription = '';
 
-    // Here, we pop up a dialog to edit the item.
+    // Pop up a  to edit the item.
     await showDialog(
       context: context,
       builder: (context) {
@@ -163,6 +167,12 @@ class _TodoItemState extends State<TodoItem>
                       value; // Update the new description similarly.
                 },
               ),
+              DropdownButtonExample(
+                onValueChanged: (newValue) {
+                  newSelectedCategory = newValue;
+                  // Update the state of the modal to reflect the new category
+                },
+              ),
             ],
           ),
           actions: <Widget>[
@@ -177,20 +187,18 @@ class _TodoItemState extends State<TodoItem>
               child: const Text('Save'),
               onPressed: () {
                 final newItem = TodoItem(
-                  text: widget.text,
+                  text: newText,
                   categoryIcon: Icons.category, // change this icon as needed
-                  description: widget.description,
-                  category: "Fitness",
+                  description: newDescription,
+                  category: newSelectedCategory,
                 );
-                if (newText.isNotEmpty || newDescription.isNotEmpty) {
+                if (newText.isNotEmpty) {
                   // Checking if values are valid
-                  // We update the task through the callback.
                   Provider.of<TodoProvider>(context, listen: false)
-                      .updateTodoItem(oldItem, newItem);
+                      .updateTodoItem(oldItem, newItem.text, newItem);
                   Navigator.of(context).pop(); // Dismiss the dialog
-                  //widget.onItemUpdated(newText, newDescription);
                 } else {
-                  // You might want to handle the error, or show a warning that fields can't be empty
+                  // Something
                 }
               },
             ),
