@@ -66,6 +66,7 @@ flutter:
    - assets/APp Icon.png
    - assets/Thumbs.jpg
    - assets/Thumbs2.jpg
+   - assets/icon/icon.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
