@@ -1,6 +1,6 @@
 {
-    "name": "coolapp",
-    "short_name": "coolapp",
+    "name": "MotiList",
+    "short_name": "MotiList",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
