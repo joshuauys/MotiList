@@ -217,7 +217,7 @@ void _showAddTaskBottomSheet(
               top: 10.0, // Adjust the value according to your needs
               left: 10.0, // Adjust the value according to your needs
               right: 10.0, // Adjust the value according to your needs
-              bottom: MediaQuery.of(context).viewInsets.bottom,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 20.0,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
