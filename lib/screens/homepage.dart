@@ -84,6 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     return Scaffold(
+      resizeToAvoidBottomInset:
+          true, // Add this line to enable resizing when the keyboard appears
       appBar: AppBar(
         //Date is animated to slide in and out when the date changes
         title: AnimatedSwitcher(
@@ -125,7 +127,6 @@ class _HomeScreenState extends State<HomeScreen> {
             // Call the update function when the user swipes right (left to right)
           }
         },
-
         child: ListView(
           padding: const EdgeInsets.all(8.0),
           //Each category in categorizedItems is mapped to its own Container
@@ -157,99 +158,99 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
-}
 
 // Calling this function adds a widget to create a new TodoItem to the bottom of the screen
-void _showAddTaskBottomSheet(
-    BuildContext context, void Function(TodoItem) addTodoItem) {
-  final titleController = TextEditingController();
-  final descController = TextEditingController();
-  String errortext = '';
-  String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
+  void _showAddTaskBottomSheet(
+      BuildContext context, void Function(TodoItem) addTodoItem) {
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
+    String errortext = '';
+    String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
 
-  showModalBottomSheet(
-    context: context,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (BuildContext context, StateSetter setModalState) {
-          return Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Add New Task', style: TextStyle(fontSize: 20)),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: titleController,
-                  decoration: const InputDecoration(
-                    labelText: 'Task Name',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: descController,
-                  decoration: const InputDecoration(
-                    labelText: 'Task Description',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                DropdownButtonExample(
-                  onValueChanged: (newValue) {
-                    selectedCategory = newValue;
-                    // Update the state of the modal to reflect the new category
-                    setModalState(() {});
-                  },
-                ),
-                const SizedBox(height: 9),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    WeekCheckbox(char: "S"),
-                    WeekCheckbox(char: "M"),
-                    WeekCheckbox(char: "T"),
-                    WeekCheckbox(char: "W"),
-                    WeekCheckbox(char: "T"),
-                    WeekCheckbox(char: "F"),
-                    WeekCheckbox(char: "S"),
+                    const Text('Add New Task', style: TextStyle(fontSize: 20)),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        labelText: 'Task Name',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: descController,
+                      decoration: const InputDecoration(
+                        labelText: 'Task Description',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    DropdownButtonExample(
+                      onValueChanged: (newValue) {
+                        setModalState(() {
+                          selectedCategory = newValue;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 9),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        WeekCheckbox(char: "S"),
+                        WeekCheckbox(char: "M"),
+                        WeekCheckbox(char: "T"),
+                        WeekCheckbox(char: "W"),
+                        WeekCheckbox(char: "T"),
+                        WeekCheckbox(char: "F"),
+                        WeekCheckbox(char: "S"),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(errortext, style: const TextStyle(color: Colors.red)),
+                    ElevatedButton(
+                      onPressed: () {
+                        final newItem = TodoItem(
+                          text: titleController.text,
+                          categoryIcon:
+                              Icons.category, // change this icon as needed
+                          description: descController.text,
+                          category: selectedCategory,
+                        );
+                        if (newItem.text.isNotEmpty) {
+                          Provider.of<TodoProvider>(context, listen: false)
+                              .addTodoItem(newItem);
+                          addTodoItem(newItem);
+                          Navigator.of(context).pop(); // Close the bottom sheet
+                        } else {
+                          //Display error messages if no task name is entered
+                          setModalState(() {
+                            errortext = "Please enter Task Name";
+                          });
+                        }
+                      },
+                      child: const Text('Add Task'),
+                    ),
                   ],
                 ),
-                const SizedBox(height: 0),
-                Text(errortext, style: const TextStyle(color: Colors.red)),
-                ElevatedButton(
-                  onPressed: () {
-                    final newItem = TodoItem(
-                      text: titleController.text,
-                      categoryIcon:
-                          Icons.category, // change this icon as needed
-                      description: descController.text,
-                      category: selectedCategory,
-
-                      //onItemUpdated: (newText, newDescription) {},
-                    );
-                    if (newItem.text.isNotEmpty) {
-                      Provider.of<TodoProvider>(context, listen: false)
-                          .addTodoItem(newItem);
-                      addTodoItem(newItem);
-                      Navigator.of(context).pop(); // Close the bottom sheet
-                    } else {
-                      //Display error messages if no task name is entered
-                      setModalState(
-                        () {
-                          errortext = "Please enter Task Name";
-                        },
-                      );
-                    }
-                  },
-                  child: const Text('Add Task'),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 }
