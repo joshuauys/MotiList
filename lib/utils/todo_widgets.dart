@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,14 +16,15 @@ class TodoProvider extends ChangeNotifier {
   }
 
   void deleteTodoItem(TodoItem todoItem) {
-    todoItems.remove(todoItem);
+    final index =
+        todoItems.indexWhere((todoItems) => todoItems.text == todoItem.text);
+    todoItems.remove(todoItems[index]);
     notifyListeners();
   }
 
-  void updateTodoItem(TodoItem oldTodoItem, String name, TodoItem newTodoItem) {
+  void updateTodoItem(TodoItem oldTodoItem, TodoItem newTodoItem) {
     final index =
         todoItems.indexWhere((todoItems) => todoItems.text == oldTodoItem.text);
-    //final index = todoItems.indexOf(oldTodoItem);
     todoItems[index] = newTodoItem;
     print(newTodoItem.weekDaysChecked);
     notifyListeners();
@@ -129,7 +132,7 @@ class _TodoItemState extends State<TodoItem>
                 if (newText.isNotEmpty) {
                   // Checking if values are valid
                   Provider.of<TodoProvider>(context, listen: false)
-                      .updateTodoItem(oldItem, newItem.text, newItem);
+                      .updateTodoItem(oldItem, newItem);
                   Navigator.of(context).pop(); // Dismiss the dialog
                 } else {
                   // Something
@@ -151,10 +154,15 @@ class _TodoItemState extends State<TodoItem>
       background: Container(color: Colors.green),
       direction: DismissDirection.horizontal,
       onDismissed: (_) {
-        print("Item dismissed.");
-
+        final oldItem = TodoItem(
+            text: widget.text,
+            categoryIcon: Icons.category, // change this icon as needed
+            description: widget.description,
+            category: widget.category,
+            weekDaysChecked: widget.weekDaysChecked);
+        Provider.of<TodoProvider>(context, listen: false)
+            .deleteTodoItem(oldItem);
         // Call the delete function when the task is dismissed.
-        //widget.onItemDeleted();
       },
       child: GestureDetector(
         onLongPress: () {
