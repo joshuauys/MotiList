@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:MotiList/utils/reusable_widget.dart';
+//import 'package:MotiList/utils/reusable_widget.dart';
 
 void main() {
-  runApp(ProfileScreen());
+  runApp(const ProfileScreen());
 }
 
 class ProfileScreen extends StatelessWidget {
+  const ProfileScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MyProfileView();
@@ -34,6 +36,8 @@ class MyProfileView extends StatelessWidget {
     },
     // Add more items as needed
   ];
+
+  MyProfileView({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +106,7 @@ class MyProfileView extends StatelessWidget {
                   );
                 }
 
-                return ListTile(
+                return const ListTile(
                     // Depending on your item type, return appropriate widgets
                     );
               },
@@ -169,7 +173,7 @@ class LeaderboardItem extends StatelessWidget {
             color: Colors.grey.withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3), // changes position of shadow
+            offset: const Offset(0, 3), // changes position of shadow
           ),
         ],
       ),
@@ -186,7 +190,7 @@ class LeaderboardItem extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
                   ),

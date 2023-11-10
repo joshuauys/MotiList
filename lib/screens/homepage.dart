@@ -1,6 +1,6 @@
-//import 'package:firebase_auth/firebase_auth.dart';
+// ignore_for_file: avoid_print
 import 'package:flutter/material.dart';
-import 'package:MotiList/utils/reusable_widget.dart';
+import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
 import 'profile.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue, // Feel free to adjust this color
       ),
-      home: HomeScreen(), // Setting your HomeScreen as the root of your app.
+      home:
+          const HomeScreen(), // Setting your HomeScreen as the root of your app.
     );
   }
 }
@@ -33,6 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
   var dayOffset = 0;
 
   List<TodoItem> get getTodoItems => todoItems;
+
+  String getCurrentDay() {
+    return formattedDate.split(' ')[0];
+  }
 
   //Returns the formatted week-date for the appbar (e.g. Monday 15)
   set updateFormattedDate(DateTime date) {
@@ -53,10 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void updateDateAndTasks(int offset) {
     setState(() {
       dayOffset += offset;
-      var now = DateTime.now();
-      updateFormattedDate = (now.add(Duration(days: dayOffset)));
-      // Update the date
-      // Update the tasks
+      var newDate = DateTime.now().add(Duration(days: dayOffset));
+      formattedDate = DateFormat('EEEE dd').format(newDate);
+      // Optionally, update other state variables if necessary
     });
   }
 
@@ -101,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             },
             icon: const Icon(Icons.person),
@@ -127,12 +131,22 @@ class _HomeScreenState extends State<HomeScreen> {
             // Call the update function when the user swipes right (left to right)
           }
         },
+
         child: ListView(
           padding: const EdgeInsets.all(8.0),
-          //Each category in categorizedItems is mapped to its own Container
-          children: categorizedItems.entries.map((entry) {
-            String category = entry.key;
-            List<TodoItem> items = entry.value;
+          itemCount: categorizedItems.length,
+          itemBuilder: (context, index) {
+            String category = categorizedItems.entries.elementAt(index).key;
+            List<TodoItem> allItems =
+                categorizedItems.entries.elementAt(index).value;
+
+            // Filter items for the current day.
+            List<TodoItem> itemsForToday = allItems.where((item) {
+              return item.weekDaysChecked[getCurrentDay()] ?? false;
+            }).toList();
+
+            // If there are no items for today, you might want to return an empty container or some placeholder.
+
             return Container(
               padding: const EdgeInsets.all(8.0),
               margin: const EdgeInsets.all(5),
@@ -149,108 +163,124 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  ...items, //Each TodoItem in items is mapped to its own Container
+                  // Use a builder to create a list of items for today
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(), // to nest ListView inside another ListView
+                    itemCount: itemsForToday.length,
+                    itemBuilder: (context, itemIndex) {
+                      TodoItem item = itemsForToday[itemIndex];
+                      return TodoItem(
+                        key: ValueKey(item),
+                        text: item.text,
+                        category: item.category,
+                        categoryIcon: item.categoryIcon,
+                        description: item.description,
+                        weekDaysChecked: item.weekDaysChecked,
+                      );
+                    },
+                  ),
                 ],
               ),
             );
-          }).toList(),
+          },
         ),
       ),
     );
   }
 
 // Calling this function adds a widget to create a new TodoItem to the bottom of the screen
-  void _showAddTaskBottomSheet(
-      BuildContext context, void Function(TodoItem) addTodoItem) {
-    final titleController = TextEditingController();
-    final descController = TextEditingController();
-    String errortext = '';
-    String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
+void _showAddTaskBottomSheet(
+    BuildContext context, void Function(TodoItem) addTodoItem) {
+  final titleController = TextEditingController();
+  final descController = TextEditingController();
+  String errortext = '';
+  String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (BuildContext context, StateSetter setModalState) {
-            return SingleChildScrollView(
-              child: Container(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setModalState) {
+          return Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Add New Task', style: TextStyle(fontSize: 20)),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(
+                    labelText: 'Task Name',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                TextField(
+                  controller: descController,
+                  decoration: const InputDecoration(
+                    labelText: 'Task Description',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                DropdownButtonExample(
+                  onValueChanged: (newValue) {
+                    selectedCategory = newValue;
+                    // Update the state of the modal to reflect the new category
+                    setModalState(() {});
+                  },
+                ),
+                const SizedBox(height: 9),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text('Add New Task', style: TextStyle(fontSize: 20)),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Task Name',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    TextField(
-                      controller: descController,
-                      decoration: const InputDecoration(
-                        labelText: 'Task Description',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    DropdownButtonExample(
-                      onValueChanged: (newValue) {
-                        setModalState(() {
-                          selectedCategory = newValue;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 9),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        WeekCheckbox(char: "S"),
-                        WeekCheckbox(char: "M"),
-                        WeekCheckbox(char: "T"),
-                        WeekCheckbox(char: "W"),
-                        WeekCheckbox(char: "T"),
-                        WeekCheckbox(char: "F"),
-                        WeekCheckbox(char: "S"),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(errortext, style: const TextStyle(color: Colors.red)),
-                    ElevatedButton(
-                      onPressed: () {
-                        final newItem = TodoItem(
-                          text: titleController.text,
-                          categoryIcon:
-                              Icons.category, // change this icon as needed
-                          description: descController.text,
-                          category: selectedCategory,
-                        );
-                        if (newItem.text.isNotEmpty) {
-                          Provider.of<TodoProvider>(context, listen: false)
-                              .addTodoItem(newItem);
-                          addTodoItem(newItem);
-                          Navigator.of(context).pop(); // Close the bottom sheet
-                        } else {
-                          //Display error messages if no task name is entered
-                          setModalState(() {
-                            errortext = "Please enter Task Name";
-                          });
-                        }
-                      },
-                      child: const Text('Add Task'),
-                    ),
+                    WeekCheckbox(char: "S"),
+                    WeekCheckbox(char: "M"),
+                    WeekCheckbox(char: "T"),
+                    WeekCheckbox(char: "W"),
+                    WeekCheckbox(char: "T"),
+                    WeekCheckbox(char: "F"),
+                    WeekCheckbox(char: "S"),
                   ],
                 ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+                const SizedBox(height: 0),
+                Text(errortext, style: const TextStyle(color: Colors.red)),
+                ElevatedButton(
+                  onPressed: () {
+                    final newItem = TodoItem(
+                      text: titleController.text,
+                      categoryIcon:
+                          Icons.category, // change this icon as needed
+                      description: descController.text,
+                      category: selectedCategory,
+
+                      //onItemUpdated: (newText, newDescription) {},
+                    );
+                    if (newItem.text.isNotEmpty) {
+                      Provider.of<TodoProvider>(context, listen: false)
+                          .addTodoItem(newItem);
+                      addTodoItem(newItem);
+                      Navigator.of(context).pop(); // Close the bottom sheet
+                    } else {
+                      //Display error messages if no task name is entered
+                      setModalState(
+                        () {
+                          errortext = "Please enter Task Name";
+                        },
+                      );
+                    }
+                  },
+                  child: const Text('Add Task'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reset_password.dart';
 import 'package:MotiList/screens/signup_page.dart';
 import 'package:MotiList/utils/conv_color.dart';
-import 'package:MotiList/utils/reusable_widget.dart';
+import 'package:MotiList/utils/register_login_widgets.dart';
 
 import 'homepage.dart';
 
@@ -15,8 +15,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  TextEditingController _passwordTextController = TextEditingController();
-  TextEditingController _emailTextController = TextEditingController();
+  final TextEditingController _passwordTextController = TextEditingController();
+  final TextEditingController _emailTextController = TextEditingController();
   String _errorMessage = "";
   @override
   Widget build(BuildContext context) {
@@ -61,8 +61,10 @@ class _LoginPageState extends State<LoginPage> {
                       email: _emailTextController.text,
                       password: _passwordTextController.text)
                   .then((value) {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const HomeScreen()));
               }).catchError((error) {
                 switch (error.code) {
                   case "invalid-email":
@@ -113,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
         GestureDetector(
           onTap: () {
             Navigator.push(context,
-                MaterialPageRoute(builder: (context) => SignUpScreen()));
+                MaterialPageRoute(builder: (context) => const SignUpScreen()));
           },
           child: const Text(
             " Sign Up",
@@ -135,8 +137,8 @@ class _LoginPageState extends State<LoginPage> {
           style: TextStyle(color: Colors.white70),
           textAlign: TextAlign.right,
         ),
-        onPressed: () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ResetPassword())),
+        onPressed: () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ResetPassword())),
       ),
     );
   }

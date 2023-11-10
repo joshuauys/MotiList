@@ -1,73 +1,7 @@
-//import 'package:MotiList/screens/homepage.dart';
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-Image logoWidget(String imageName) {
-  return Image.asset(
-    imageName,
-    fit: BoxFit.fitWidth,
-    width: 240,
-    height: 240,
-    color: Colors.white,
-  );
-}
-
-TextField reusableTextField(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller) {
-  return TextField(
-    controller: controller,
-    obscureText: isPasswordType,
-    enableSuggestions: !isPasswordType,
-    autocorrect: !isPasswordType,
-    cursorColor: Colors.white,
-    style: TextStyle(color: Colors.white.withOpacity(0.9)),
-    decoration: InputDecoration(
-      prefixIcon: Icon(
-        icon,
-        color: Colors.white70,
-      ),
-      labelText: text,
-      labelStyle: TextStyle(color: Colors.white.withOpacity(0.9)),
-      filled: true,
-      floatingLabelBehavior: FloatingLabelBehavior.never,
-      fillColor: Colors.white.withOpacity(0.3),
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0),
-          borderSide: const BorderSide(width: 0, style: BorderStyle.none)),
-    ),
-    keyboardType: isPasswordType
-        ? TextInputType.visiblePassword
-        : TextInputType.emailAddress,
-  );
-}
-
-Container firebaseUIButton(BuildContext context, String title, Function onTap) {
-  return Container(
-    width: MediaQuery.of(context).size.width,
-    height: 50,
-    margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
-    decoration: BoxDecoration(borderRadius: BorderRadius.circular(90)),
-    child: ElevatedButton(
-      onPressed: () {
-        onTap();
-      },
-      style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.pressed)) {
-              return Colors.black26;
-            }
-            return Colors.white;
-          }),
-          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)))),
-      child: Text(
-        title,
-        style: const TextStyle(
-            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 16),
-      ),
-    ),
-  );
-}
 
 class TodoProvider extends ChangeNotifier {
   List<TodoItem> todoItems = [];
@@ -82,17 +16,17 @@ class TodoProvider extends ChangeNotifier {
   }
 
   void deleteTodoItem(TodoItem todoItem) {
-    todoItems.remove(todoItem);
+    final index =
+        todoItems.indexWhere((todoItems) => todoItems.text == todoItem.text);
+    todoItems.remove(todoItems[index]);
     notifyListeners();
   }
 
-  void updateTodoItem(TodoItem oldTodoItem, String name, TodoItem newTodoItem) {
+  void updateTodoItem(TodoItem oldTodoItem, TodoItem newTodoItem) {
     final index =
         todoItems.indexWhere((todoItems) => todoItems.text == oldTodoItem.text);
-    //final index = todoItems.indexOf(oldTodoItem);
     todoItems[index] = newTodoItem;
-    print(newTodoItem.text);
-    print(index);
+    print(newTodoItem.weekDaysChecked);
     notifyListeners();
   }
 }
@@ -102,13 +36,15 @@ class TodoItem extends StatefulWidget {
   final IconData categoryIcon;
   final String description;
   final String category;
+  final Map<String, bool> weekDaysChecked;
 
-  TodoItem({
+  const TodoItem({
     Key? key,
     required this.text,
     required this.categoryIcon,
     required this.description,
     required this.category,
+    required this.weekDaysChecked,
 
     //required this.onItemUpdated, // Initialize in constructor
   }) : super(key: key);
@@ -124,11 +60,11 @@ class _TodoItemState extends State<TodoItem>
 
   void _editCurrentItem() async {
     final oldItem = TodoItem(
-      text: widget.text,
-      categoryIcon: Icons.category, // change this icon as needed
-      description: widget.description,
-      category: widget.category,
-    );
+        text: widget.text,
+        categoryIcon: Icons.category, // change this icon as needed
+        description: widget.description,
+        category: widget.category,
+        weekDaysChecked: widget.weekDaysChecked);
     // Retrieving current values.
     final currentText = widget.text;
     final currentDescription = widget.description;
@@ -191,11 +127,12 @@ class _TodoItemState extends State<TodoItem>
                   categoryIcon: Icons.category, // change this icon as needed
                   description: newDescription,
                   category: newSelectedCategory,
+                  weekDaysChecked: widget.weekDaysChecked,
                 );
                 if (newText.isNotEmpty) {
                   // Checking if values are valid
                   Provider.of<TodoProvider>(context, listen: false)
-                      .updateTodoItem(oldItem, newItem.text, newItem);
+                      .updateTodoItem(oldItem, newItem);
                   Navigator.of(context).pop(); // Dismiss the dialog
                 } else {
                   // Something
@@ -217,9 +154,15 @@ class _TodoItemState extends State<TodoItem>
       background: Container(color: Colors.green),
       direction: DismissDirection.horizontal,
       onDismissed: (_) {
-        print("Item dismissed.");
+        final oldItem = TodoItem(
+            text: widget.text,
+            categoryIcon: Icons.category, // change this icon as needed
+            description: widget.description,
+            category: widget.category,
+            weekDaysChecked: widget.weekDaysChecked);
+        Provider.of<TodoProvider>(context, listen: false)
+            .deleteTodoItem(oldItem);
         // Call the delete function when the task is dismissed.
-        //widget.onItemDeleted();
       },
       child: GestureDetector(
         onLongPress: () {
@@ -235,7 +178,7 @@ class _TodoItemState extends State<TodoItem>
               (Set<MaterialState> states) {
                 if (states.contains(MaterialState.selected)) {
                   return isChecked
-                      ? Color.fromARGB(255, 189, 9, 239)
+                      ? const Color.fromARGB(255, 189, 9, 239)
                       : Colors.red;
                 }
                 return Colors.grey; // Use default color when not selected
@@ -329,10 +272,11 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
 //Checkbox Class for users to select what days they want to be reminded
 class WeekCheckbox extends StatefulWidget {
   String char = "X";
-  WeekCheckbox({super.key, required this.char});
+  final Function(bool) onChecked;
+  WeekCheckbox({super.key, required this.char, required this.onChecked});
 
   @override
-  _WeekCheckboxState createState() => _WeekCheckboxState(char: this.char);
+  _WeekCheckboxState createState() => _WeekCheckboxState(char: char);
 }
 
 class _WeekCheckboxState extends State<WeekCheckbox> {
@@ -351,6 +295,7 @@ class _WeekCheckboxState extends State<WeekCheckbox> {
             setState(
               () {
                 isChecked = value!;
+                widget.onChecked(isChecked);
               },
             );
           },
@@ -365,80 +310,6 @@ class _WeekCheckboxState extends State<WeekCheckbox> {
           ),
         ),
       ],
-    );
-  }
-}
-
-// A single leaderboard item representing each user's data.
-class LeaderboardItem extends StatelessWidget {
-  final String imageUrl;
-  final String name;
-  final int points;
-
-  const LeaderboardItem({
-    Key? key,
-    required this.imageUrl,
-    required this.name,
-    required this.points,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 5.0),
-      child: Row(
-        children: <Widget>[
-          // The circular image.
-          CircleAvatar(
-            backgroundImage: NetworkImage(imageUrl),
-            radius: 30.0, // You can adjust the size of the avatar as required.
-          ),
-          const SizedBox(
-              width: 15.0), // Some spacing between the picture and the text.
-          // User's name and points.
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  name,
-                  style: const TextStyle(
-                    fontSize: 18.0, // Adjust your size as needed.
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$points pts',
-                  style: TextStyle(
-                    fontSize: 16.0, // Adjust your size as needed.
-                    color: Colors.grey[
-                        600], // You can choose the appropriate color for your design.
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// The entire leaderboard widget.
-class Leaderboard extends StatelessWidget {
-  final List<LeaderboardItem> items;
-
-  const Leaderboard({Key? key, required this.items}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          return items[index];
-        },
-      ),
     );
   }
 }
