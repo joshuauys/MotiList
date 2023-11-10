@@ -88,8 +88,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     return Scaffold(
-      resizeToAvoidBottomInset:
-          true, // Add this line to enable resizing when the keyboard appears
       appBar: AppBar(
         //Date is animated to slide in and out when the date changes
         title: AnimatedSwitcher(
@@ -132,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
 
-        child: ListView(
+        child: ListView.builder(
           padding: const EdgeInsets.all(8.0),
           itemCount: categorizedItems.length,
           itemBuilder: (context, index) {
@@ -189,12 +187,22 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+}
 
 // Calling this function adds a widget to create a new TodoItem to the bottom of the screen
 void _showAddTaskBottomSheet(
     BuildContext context, void Function(TodoItem) addTodoItem) {
   final titleController = TextEditingController();
   final descController = TextEditingController();
+  Map<String, bool> weekDaysChecked = {
+    'Sunday': false,
+    'Monday': false,
+    'Tuesday': false,
+    'Wednesday': false,
+    'Thursday': false,
+    'Friday': false,
+    'Saturday': false,
+  };
   String errortext = '';
   String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
 
@@ -204,7 +212,8 @@ void _showAddTaskBottomSheet(
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {
           return Container(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -238,13 +247,48 @@ void _showAddTaskBottomSheet(
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    WeekCheckbox(char: "S"),
-                    WeekCheckbox(char: "M"),
-                    WeekCheckbox(char: "T"),
-                    WeekCheckbox(char: "W"),
-                    WeekCheckbox(char: "T"),
-                    WeekCheckbox(char: "F"),
-                    WeekCheckbox(char: "S"),
+                    WeekCheckbox(
+                      char: "M",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Monday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "T",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Tuesday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "W",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Wednesday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "Tu",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Thursday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "F",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Friday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "Sa",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Saturday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "Su",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Sunday'] = isChecked;
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 0),
@@ -252,14 +296,15 @@ void _showAddTaskBottomSheet(
                 ElevatedButton(
                   onPressed: () {
                     final newItem = TodoItem(
-                      text: titleController.text,
-                      categoryIcon:
-                          Icons.category, // change this icon as needed
-                      description: descController.text,
-                      category: selectedCategory,
+                        text: titleController.text,
+                        categoryIcon:
+                            Icons.category, // change this icon as needed
+                        description: descController.text,
+                        category: selectedCategory,
+                        weekDaysChecked: weekDaysChecked
 
-                      //onItemUpdated: (newText, newDescription) {},
-                    );
+                        //onItemUpdated: (newText, newDescription) {},
+                        );
                     if (newItem.text.isNotEmpty) {
                       Provider.of<TodoProvider>(context, listen: false)
                           .addTodoItem(newItem);
