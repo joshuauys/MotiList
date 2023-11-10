@@ -91,8 +91,7 @@ class TodoProvider extends ChangeNotifier {
         todoItems.indexWhere((todoItems) => todoItems.text == oldTodoItem.text);
     //final index = todoItems.indexOf(oldTodoItem);
     todoItems[index] = newTodoItem;
-    print(newTodoItem.text);
-    print(index);
+    print(newTodoItem.weekDaysChecked);
     notifyListeners();
   }
 }
@@ -102,6 +101,7 @@ class TodoItem extends StatefulWidget {
   final IconData categoryIcon;
   final String description;
   final String category;
+  final Map<String, bool> weekDaysChecked;
 
   TodoItem({
     Key? key,
@@ -109,6 +109,7 @@ class TodoItem extends StatefulWidget {
     required this.categoryIcon,
     required this.description,
     required this.category,
+    required this.weekDaysChecked,
 
     //required this.onItemUpdated, // Initialize in constructor
   }) : super(key: key);
@@ -124,11 +125,11 @@ class _TodoItemState extends State<TodoItem>
 
   void _editCurrentItem() async {
     final oldItem = TodoItem(
-      text: widget.text,
-      categoryIcon: Icons.category, // change this icon as needed
-      description: widget.description,
-      category: widget.category,
-    );
+        text: widget.text,
+        categoryIcon: Icons.category, // change this icon as needed
+        description: widget.description,
+        category: widget.category,
+        weekDaysChecked: widget.weekDaysChecked);
     // Retrieving current values.
     final currentText = widget.text;
     final currentDescription = widget.description;
@@ -191,6 +192,7 @@ class _TodoItemState extends State<TodoItem>
                   categoryIcon: Icons.category, // change this icon as needed
                   description: newDescription,
                   category: newSelectedCategory,
+                  weekDaysChecked: widget.weekDaysChecked,
                 );
                 if (newText.isNotEmpty) {
                   // Checking if values are valid
@@ -329,7 +331,8 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
 //Checkbox Class for users to select what days they want to be reminded
 class WeekCheckbox extends StatefulWidget {
   String char = "X";
-  WeekCheckbox({super.key, required this.char});
+  final Function(bool) onChecked;
+  WeekCheckbox({super.key, required this.char, required this.onChecked});
 
   @override
   _WeekCheckboxState createState() => _WeekCheckboxState(char: this.char);
@@ -351,6 +354,7 @@ class _WeekCheckboxState extends State<WeekCheckbox> {
             setState(
               () {
                 isChecked = value!;
+                widget.onChecked(isChecked);
               },
             );
           },

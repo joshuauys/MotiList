@@ -34,6 +34,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<TodoItem> get getTodoItems => todoItems;
 
+  String getCurrentDay() {
+    return formattedDate.split(' ')[0];
+  }
+
   //Returns the formatted week-date for the appbar (e.g. Monday 15)
   set updateFormattedDate(DateTime date) {
     var formatter = DateFormat('EEEE dd');
@@ -53,10 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void updateDateAndTasks(int offset) {
     setState(() {
       dayOffset += offset;
-      var now = DateTime.now();
-      updateFormattedDate = (now.add(Duration(days: dayOffset)));
-      // Update the date
-      // Update the tasks
+      var newDate = DateTime.now().add(Duration(days: dayOffset));
+      formattedDate = DateFormat('EEEE dd').format(newDate);
+      // Optionally, update other state variables if necessary
     });
   }
 
@@ -126,12 +129,21 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         },
 
-        child: ListView(
+        child: ListView.builder(
           padding: const EdgeInsets.all(8.0),
-          //Each category in categorizedItems is mapped to its own Container
-          children: categorizedItems.entries.map((entry) {
-            String category = entry.key;
-            List<TodoItem> items = entry.value;
+          itemCount: categorizedItems.length,
+          itemBuilder: (context, index) {
+            String category = categorizedItems.entries.elementAt(index).key;
+            List<TodoItem> allItems =
+                categorizedItems.entries.elementAt(index).value;
+
+            // Filter items for the current day.
+            List<TodoItem> itemsForToday = allItems.where((item) {
+              return item.weekDaysChecked[getCurrentDay()] ?? false;
+            }).toList();
+
+            // If there are no items for today, you might want to return an empty container or some placeholder.
+
             return Container(
               padding: const EdgeInsets.all(8.0),
               margin: const EdgeInsets.all(5),
@@ -148,11 +160,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  ...items, //Each TodoItem in items is mapped to its own Container
+                  // Use a builder to create a list of items for today
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics:
+                        const NeverScrollableScrollPhysics(), // to nest ListView inside another ListView
+                    itemCount: itemsForToday.length,
+                    itemBuilder: (context, itemIndex) {
+                      TodoItem item = itemsForToday[itemIndex];
+                      return TodoItem(
+                        key: ValueKey(item),
+                        text: item.text,
+                        category: item.category,
+                        categoryIcon: item.categoryIcon,
+                        description: item.description,
+                        weekDaysChecked: item.weekDaysChecked,
+                      );
+                    },
+                  ),
                 ],
               ),
             );
-          }).toList(),
+          },
         ),
       ),
     );
@@ -164,6 +193,15 @@ void _showAddTaskBottomSheet(
     BuildContext context, void Function(TodoItem) addTodoItem) {
   final titleController = TextEditingController();
   final descController = TextEditingController();
+  Map<String, bool> weekDaysChecked = {
+    'Sunday': false,
+    'Monday': false,
+    'Tuesday': false,
+    'Wednesday': false,
+    'Thursday': false,
+    'Friday': false,
+    'Saturday': false,
+  };
   String errortext = '';
   String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
 
@@ -207,13 +245,48 @@ void _showAddTaskBottomSheet(
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    WeekCheckbox(char: "S"),
-                    WeekCheckbox(char: "M"),
-                    WeekCheckbox(char: "T"),
-                    WeekCheckbox(char: "W"),
-                    WeekCheckbox(char: "T"),
-                    WeekCheckbox(char: "F"),
-                    WeekCheckbox(char: "S"),
+                    WeekCheckbox(
+                      char: "M",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Monday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "T",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Tuesday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "W",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Wednesday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "Tu",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Thursday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "F",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Friday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "Sa",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Saturday'] = isChecked;
+                      },
+                    ),
+                    WeekCheckbox(
+                      char: "Su",
+                      onChecked: (isChecked) {
+                        weekDaysChecked['Sunday'] = isChecked;
+                      },
+                    ),
                   ],
                 ),
                 const SizedBox(height: 0),
@@ -221,14 +294,15 @@ void _showAddTaskBottomSheet(
                 ElevatedButton(
                   onPressed: () {
                     final newItem = TodoItem(
-                      text: titleController.text,
-                      categoryIcon:
-                          Icons.category, // change this icon as needed
-                      description: descController.text,
-                      category: selectedCategory,
+                        text: titleController.text,
+                        categoryIcon:
+                            Icons.category, // change this icon as needed
+                        description: descController.text,
+                        category: selectedCategory,
+                        weekDaysChecked: weekDaysChecked
 
-                      //onItemUpdated: (newText, newDescription) {},
-                    );
+                        //onItemUpdated: (newText, newDescription) {},
+                        );
                     if (newItem.text.isNotEmpty) {
                       Provider.of<TodoProvider>(context, listen: false)
                           .addTodoItem(newItem);
