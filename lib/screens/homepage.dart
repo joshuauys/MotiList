@@ -1,6 +1,6 @@
 //import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:MotiList/utils/reusable_widget.dart';
+import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
 import 'profile.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +21,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue, // Feel free to adjust this color
       ),
-      home: HomeScreen(), // Setting your HomeScreen as the root of your app.
+      home:
+          const HomeScreen(), // Setting your HomeScreen as the root of your app.
     );
   }
 }
@@ -102,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ProfileScreen()),
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             },
             icon: const Icon(Icons.person),
