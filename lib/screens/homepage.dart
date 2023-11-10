@@ -212,7 +212,7 @@ void _showAddTaskBottomSheet(
     builder: (context) {
       return StatefulBuilder(
         builder: (BuildContext context, StateSetter setModalState) {
-          return Container(
+          return SingleChildScrollView(
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Column(
