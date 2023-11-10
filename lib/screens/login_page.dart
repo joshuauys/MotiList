@@ -43,58 +43,74 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 30,
             ),
-            reusableTextField("Enter Email", Icons.person_outline, false,
-                _emailTextController),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0), // Adjust the horizontal padding as needed
+              child: reusableTextField("Enter Email", Icons.person_outline,
+                  false, _emailTextController),
+            ),
             const SizedBox(
               height: 10,
             ),
-            reusableTextField("Enter Password", Icons.lock_outline, true,
-                _passwordTextController),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0), // Adjust the horizontal padding as needed
+              child: reusableTextField("Enter Password", Icons.lock_outline,
+                  true, _passwordTextController),
+            ),
             const SizedBox(
               height: 5,
             ),
             //Text("data"),
-            forgetPassword(context),
-            firebaseUIButton(context, "Sign In", () {
-              FirebaseAuth.instance
-                  .signInWithEmailAndPassword(
-                      email: _emailTextController.text,
-                      password: _passwordTextController.text)
-                  .then((value) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
-              }).catchError((error) {
-                switch (error.code) {
-                  case "invalid-email":
-                    setState(() {
-                      _errorMessage =
-                          "Your email address is not formated correctly.";
-                    });
-                    break;
-                  case "user-disabled":
-                    setState(() {
-                      _errorMessage = "Your account has been disabled.";
-                    });
-                    break;
-                  case "user-not-found":
-                    setState(() {
-                      _errorMessage = "User with this email doesn't exist.";
-                    });
-                    break;
-                  case "wrong-password":
-                    setState(() {
-                      _errorMessage = "Invalid password.";
-                    });
-                    break;
-                  default:
-                    setState(() {
-                      _errorMessage = "Error ${error.toString()}";
-                    });
-                }
-              });
-            }),
+            Padding(
+              padding: const EdgeInsets.only(
+                  right: 20.0), // Adjust the right padding as needed
+              child: forgetPassword(context),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0), // Adjust the horizontal padding as needed
+              child: firebaseUIButton(context, "Sign In", () {
+                FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                        email: _emailTextController.text,
+                        password: _passwordTextController.text)
+                    .then((value) {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()));
+                }).catchError((error) {
+                  switch (error.code) {
+                    case "invalid-email":
+                      setState(() {
+                        _errorMessage =
+                            "Your email address is not formated correctly.";
+                      });
+                      break;
+                    case "user-disabled":
+                      setState(() {
+                        _errorMessage = "Your account has been disabled.";
+                      });
+                      break;
+                    case "user-not-found":
+                      setState(() {
+                        _errorMessage = "User with this email doesn't exist.";
+                      });
+                      break;
+                    case "wrong-password":
+                      setState(() {
+                        _errorMessage = "Invalid password.";
+                      });
+                      break;
+                    default:
+                      setState(() {
+                        _errorMessage = "Error ${error.toString()}";
+                      });
+                  }
+                });
+              }),
+            ),
             signUpOption(),
             Text(
               _errorMessage,
