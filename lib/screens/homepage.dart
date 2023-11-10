@@ -214,7 +214,11 @@ void _showAddTaskBottomSheet(
         builder: (BuildContext context, StateSetter setModalState) {
           return SingleChildScrollView(
             padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
+              top: 10.0, // Adjust the value according to your needs
+              left: 10.0, // Adjust the value according to your needs
+              right: 10.0, // Adjust the value according to your needs
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
