@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         //Date is animated to slide in and out when the date changes
         title: AnimatedSwitcher(
           duration: const Duration(milliseconds: 150),
