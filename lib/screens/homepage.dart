@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.today), // You can use any icon here
+          icon: Icon(Icons.today), // This button returns user to today's date
           onPressed: () {
             // Handle button press
             print('Button Pressed!');
@@ -257,7 +257,7 @@ void _showAddTaskBottomSheet(
                     setModalState(() {});
                   },
                 ),
-                const SizedBox(height: 9),
+                const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -305,7 +305,7 @@ void _showAddTaskBottomSheet(
                     ),
                   ],
                 ),
-                const SizedBox(height: 0),
+                const SizedBox(height: 20),
                 Text(errortext, style: const TextStyle(color: Colors.red)),
                 ElevatedButton(
                   onPressed: () {

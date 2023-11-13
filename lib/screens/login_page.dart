@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
             Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: 20.0), // Adjust the horizontal padding as needed
-              child: reusableTextField("Enter Email", Icons.person_outline,
+              child: reusableTextField("Enter Email", Icons.alternate_email,
                   false, _emailTextController),
             ),
             const SizedBox(
@@ -59,8 +59,8 @@ class _LoginPageState extends State<LoginPage> {
             Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: 20.0), // Adjust the horizontal padding as needed
-              child: reusableTextField("Enter Password", Icons.lock_outline,
-                  true, _passwordTextController),
+              child: reusableTextField(
+                  "Enter Password", Icons.lock, true, _passwordTextController),
             ),
             const SizedBox(
               height: 5,

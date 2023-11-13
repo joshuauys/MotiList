@@ -41,8 +41,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                 const SizedBox(
                   height: 20,
                 ),
-                reusableTextField("Enter Email Id", Icons.person_outline, false,
-                    _emailTextController),
+                reusableTextField("Enter Email Id", Icons.alternate_email,
+                    false, _emailTextController),
                 const SizedBox(
                   height: 20,
                 ),

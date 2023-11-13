@@ -47,6 +47,7 @@ class MyProfileView extends StatelessWidget {
         title: const Text('Profile'),
         actions: [
           IconButton(
+            //logout button
             icon: Icon(Icons.exit_to_app),
             onPressed: () async {
               try {
