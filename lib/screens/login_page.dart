@@ -80,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
                         email: _emailTextController.text,
                         password: _passwordTextController.text)
                     .then((value) {
-                  Navigator.push(
+                  Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
                           builder: (context) => const HomeScreen()));

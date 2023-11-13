@@ -15,6 +15,7 @@ class ProfileScreen extends StatelessWidget {
 }
 
 class MyProfileView extends StatelessWidget {
+  //String imageUrl = user.photoUrl;
   final List<Map<String, dynamic>> items = [
     {
       'type': 'text',
@@ -34,7 +35,6 @@ class MyProfileView extends StatelessWidget {
       'data':
           'https://previews.123rf.com/images/happyvector071/happyvector0711904/happyvector071190414500/120957417-creative-illustration-of-default-avatar-profile-placeholder-isolated-on-background-art-design-grey.jpg',
     },
-    // Add more items as needed
   ];
 
   MyProfileView({super.key});
@@ -82,6 +82,7 @@ class MyProfileView extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                             fit: BoxFit.fitHeight,
+                            //set to NetworkImage(imageUrl)
                             image: NetworkImage(item['data']),
                           ),
                         ),
