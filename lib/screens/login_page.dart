@@ -5,6 +5,7 @@ import 'package:MotiList/screens/signup_page.dart';
 import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'homepage.dart';
 
@@ -16,6 +17,28 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool isLoggedIn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check if the user is logged in from shared preferences
+    checkLoginStatus();
+  }
+
+  Future<void> checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    setState(() {
+      isLoggedIn = loggedIn;
+    });
+  }
+
+  Future<void> setLoginStatus(bool loggedIn) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', loggedIn);
+  }
+
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
   String _errorMessage = "";
@@ -81,6 +104,10 @@ class _LoginPageState extends State<LoginPage> {
                         email: _emailTextController.text,
                         password: _passwordTextController.text)
                     .then((value) {
+                  setLoginStatus(true);
+                  setState(() {
+                    isLoggedIn = true;
+                  });
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
