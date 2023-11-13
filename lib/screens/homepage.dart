@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
 //HomeScreen state, contain all the relevent variables and UI for the home screen
 class _HomeScreenState extends State<HomeScreen> {
   final List<TodoItem> todoItems = [];
-  var formattedDate = DateFormat('EEEE dd').format(DateTime.now());
+  var formattedDate = DateFormat('EEEE dd MMM').format(DateTime.now());
   var dayOffset = 0;
 
   List<TodoItem> get getTodoItems => todoItems;
@@ -39,9 +39,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return formattedDate.split(' ')[0];
   }
 
-  //Returns the formatted week-date for the appbar (e.g. Monday 15)
+  //Returns the formatted week-date for the appbar (e.g. Monday 15 July)
   set updateFormattedDate(DateTime date) {
-    var formatter = DateFormat('EEEE dd');
+    var formatter = DateFormat('EEEE dd MMM');
     setState(() {
       formattedDate = formatter.format(date);
     });
@@ -59,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       dayOffset += offset;
       var newDate = DateTime.now().add(Duration(days: dayOffset));
-      formattedDate = DateFormat('EEEE dd').format(newDate);
+      formattedDate = DateFormat('EEEE dd MMM').format(newDate);
       // Optionally, update other state variables if necessary
     });
   }
@@ -90,6 +90,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.today), // You can use any icon here
+          onPressed: () {
+            // Handle button press
+            print('Button Pressed!');
+            updateDateAndTasks(-dayOffset);
+          },
+        ),
         automaticallyImplyLeading: false,
         //Date is animated to slide in and out when the date changes
         title: AnimatedSwitcher(
@@ -124,10 +132,10 @@ class _HomeScreenState extends State<HomeScreen> {
           // The velocity is positive when the swipe direction is right to left.
           if (details.primaryVelocity! < 0) {
             print('Swiped Left to Right');
-            updateDateAndTasks(-1);
+            updateDateAndTasks(1);
           } else {
             print('Swiped Right to Left');
-            updateDateAndTasks(1);
+            updateDateAndTasks(-1);
             // Call the update function when the user swipes right (left to right)
           }
         },
