@@ -4,6 +4,7 @@ import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
 import 'profile.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
 
 // A stateful widget representing the home screen of the app.
 class HomeScreen extends StatefulWidget {
@@ -91,7 +92,8 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.today), // This button returns user to today's date
+          icon: Icon(CupertinoIcons
+              .calendar_today), // This button returns user to today's date
           onPressed: () {
             // Handle button press
             print('Button Pressed!');

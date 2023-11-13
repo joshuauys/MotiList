@@ -4,6 +4,7 @@ import 'package:MotiList/utils/reset_password.dart';
 import 'package:MotiList/screens/signup_page.dart';
 import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'homepage.dart';
 
@@ -59,8 +60,8 @@ class _LoginPageState extends State<LoginPage> {
             Padding(
               padding: const EdgeInsets.symmetric(
                   horizontal: 20.0), // Adjust the horizontal padding as needed
-              child: reusableTextField(
-                  "Enter Password", Icons.lock, true, _passwordTextController),
+              child: reusableTextField("Enter Password",
+                  CupertinoIcons.lock_fill, true, _passwordTextController),
             ),
             const SizedBox(
               height: 5,
