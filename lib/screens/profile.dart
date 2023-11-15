@@ -33,6 +33,14 @@ class _MyProfileViewState extends State<MyProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Handle search action here
+          // You can navigate to a search screen or perform the search directly in this function
+        },
+        tooltip: 'Search',
+        child: Icon(Icons.search),
+      ),
       appBar: AppBar(
         title: const Text('My Profile'),
         actions: [
