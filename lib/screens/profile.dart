@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 void main() {
   runApp(const ProfileScreen());
@@ -30,13 +32,30 @@ class _MyProfileViewState extends State<MyProfileView> {
     checkLoginStatus();
   }
 
+  Future<String> uploadProfilePhoto(File photoFile, String userId) async {
+    try {
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profile_photos')
+          .child('$userId.jpg');
+
+      UploadTask uploadTask = storageReference.putFile(photoFile);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading profile photo: $e');
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Handle search action here
-          // You can navigate to a search screen or perform the search directly in this function
+          // uploadProfilePhoto(photoFile, userId)
         },
         tooltip: 'Search',
         child: Icon(Icons.search),
