@@ -46,6 +46,7 @@ class _MyProfileViewState extends State<MyProfileView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app),
+            tooltip: 'Logout',
             onPressed: () async {
               try {
                 await FirebaseAuth.instance.signOut();
@@ -69,6 +70,7 @@ class _MyProfileViewState extends State<MyProfileView> {
           onPressed: () {
             Navigator.pop(context);
           },
+          tooltip: 'Back',
         ),
       ),
       body: Column(

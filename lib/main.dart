@@ -4,13 +4,15 @@ import 'screens/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'screens/firebase_options.dart';
 import 'package:provider/provider.dart';
+import 'provider.dart'; // Import your provider class
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (context) => MyProvider(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
