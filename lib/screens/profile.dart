@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
@@ -58,7 +60,7 @@ class _MyProfileViewState extends State<MyProfileView> {
           // uploadProfilePhoto(photoFile, userId)
         },
         tooltip: 'Search',
-        child: Icon(Icons.search),
+        child: const Icon(Icons.search),
       ),
       appBar: AppBar(
         title: const Text('My Profile'),

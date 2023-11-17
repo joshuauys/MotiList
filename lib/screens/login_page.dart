@@ -60,10 +60,10 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(
               height: 30,
             ),
-            Padding(
-              padding: const EdgeInsets.only(
+            const Padding(
+              padding: EdgeInsets.only(
                   top: 20.0), // Adjust the top padding as needed
-              child: const Image(
+              child: Image(
                   image: AssetImage("assets/App Icon.jpg"),
                   height: 101,
                   width: 101),

@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(CupertinoIcons
+          icon: const Icon(CupertinoIcons
               .calendar_today), // This button returns user to today's date
           onPressed: () {
             // Handle button press
