@@ -14,6 +14,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,11 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   //Updates build to add new TodoItem to the list
-  void addTodoItem(TodoItem item) {
-    setState(() {
-      todoItems.add(item);
-    });
-  }
 
   //Updates build to update the date and tasks
   void updateDateAndTasks(int offset) {
@@ -83,9 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
       'Personal': const Color.fromARGB(255, 76, 175, 80),
       'Work': const Color.fromARGB(255, 33, 150, 243),
     };
-    todoList.forEach((item) {
+    for (var item in todoList) {
       categorizedItems[item.category]?.add(item);
-    });
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -112,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          _showAddTaskBottomSheet(context, addTodoItem);
+          _showAddTaskBottomSheet(context);
         },
         child: const Icon(Icons.add),
       ),
@@ -190,8 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // Calling this function adds a widget to create a new TodoItem to the bottom of the screen
-void _showAddTaskBottomSheet(
-    BuildContext context, void Function(TodoItem) addTodoItem) {
+void _showAddTaskBottomSheet(BuildContext context) {
   final titleController = TextEditingController();
   final descController = TextEditingController();
   Map<String, bool> weekDaysChecked = {
@@ -307,7 +303,7 @@ void _showAddTaskBottomSheet(
                     if (newItem.text.isNotEmpty) {
                       Provider.of<TodoProvider>(context, listen: false)
                           .addTodoItem(newItem);
-                      addTodoItem(newItem);
+
                       Navigator.of(context).pop(); // Close the bottom sheet
                     } else {
                       //Display error messages if no task name is entered
