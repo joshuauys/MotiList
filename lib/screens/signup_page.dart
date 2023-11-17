@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
@@ -47,18 +48,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                reusableTextField("Enter Username", Icons.person_outline, false,
-                    _userNameTextController),
+                reusableTextField("Enter Username", CupertinoIcons.person_fill,
+                    false, _userNameTextController),
                 const SizedBox(
                   height: 20,
                 ),
-                reusableTextField("Enter Email", Icons.person_outline, false,
+                reusableTextField("Enter Email", Icons.alternate_email, false,
                     _emailTextController),
                 const SizedBox(
                   height: 20,
                 ),
-                reusableTextField("Enter Password", Icons.lock_outlined, true,
-                    _passwordTextController),
+                reusableTextField("Enter Password", CupertinoIcons.lock_fill,
+                    true, _passwordTextController),
                 const SizedBox(
                   height: 20,
                 ),

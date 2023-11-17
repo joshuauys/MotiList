@@ -1,12 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-//import 'package:MotiList/utils/reusable_widget.dart';
+import 'login_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io';
 
 void main() {
   runApp(const ProfileScreen());
 }
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,40 +18,78 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-class MyProfileView extends StatelessWidget {
-  final List<Map<String, dynamic>> items = [
-    {
-      'type': 'text',
-      'data': 'Joshua Uys',
-    },
-    {
-      'type': 'image',
-      'data':
-          'https://upload.wikimedia.org/wikipedia/commons/4/41/Profile-720.png',
-    },
-    {
-      'type': 'text',
-      'data': 'Followers  Following',
-    },
-    {
-      'type': 'picture',
-      'data':
-          'https://previews.123rf.com/images/happyvector071/happyvector0711904/happyvector071190414500/120957417-creative-illustration-of-default-avatar-profile-placeholder-isolated-on-background-art-design-grey.jpg',
-    },
-    // Add more items as needed
-  ];
+class MyProfileView extends StatefulWidget {
+  @override
+  _MyProfileViewState createState() => _MyProfileViewState();
+}
 
-  MyProfileView({super.key});
+class _MyProfileViewState extends State<MyProfileView> {
+  bool isLoggedIn = true;
+
+  @override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
+
+  Future<String> uploadProfilePhoto(File photoFile, String userId) async {
+    try {
+      Reference storageReference = FirebaseStorage.instance
+          .ref()
+          .child('profile_photos')
+          .child('$userId.jpg');
+
+      UploadTask uploadTask = storageReference.putFile(photoFile);
+      TaskSnapshot taskSnapshot = await uploadTask.whenComplete(() {});
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading profile photo: $e');
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // uploadProfilePhoto(photoFile, userId)
+        },
+        tooltip: 'Search',
+        child: Icon(Icons.search),
+      ),
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('My Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            tooltip: 'Logout',
+            onPressed: () async {
+              try {
+                await FirebaseAuth.instance.signOut();
+                setLoginStatus(false);
+                setState(() {
+                  isLoggedIn = false;
+                });
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                );
+              } catch (e) {
+                print('Error during logout: $e');
+                // Handle error if needed
+              }
+            },
+          ),
+        ],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
+          tooltip: 'Back',
         ),
       ),
       body: Column(
@@ -64,9 +106,8 @@ class MyProfileView extends StatelessWidget {
                       child: Text(
                         item['data'],
                         style: const TextStyle(
-                          fontSize: 20.0, // Adjust the font size as needed
-                          fontWeight: FontWeight
-                              .bold, // Adjust the font weight as needed
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -76,8 +117,8 @@ class MyProfileView extends StatelessWidget {
                   return ListTile(
                     title: ClipOval(
                       child: Container(
-                        width: 150.0, // Adjust the size as needed
-                        height: 150.0, // Adjust the size as needed
+                        width: 150.0,
+                        height: 150.0,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
@@ -92,8 +133,8 @@ class MyProfileView extends StatelessWidget {
                   return ListTile(
                     title: ClipOval(
                       child: Container(
-                        width: 50.0, // Adjust the size as needed
-                        height: 50.0, // Adjust the size as needed
+                        width: 50.0,
+                        height: 50.0,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
@@ -106,9 +147,7 @@ class MyProfileView extends StatelessWidget {
                   );
                 }
 
-                return const ListTile(
-                    // Depending on your item type, return appropriate widgets
-                    );
+                return const ListTile();
               },
             ),
           ),
@@ -146,6 +185,34 @@ class MyProfileView extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> checkLoginStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    setState(() {
+      isLoggedIn = loggedIn;
+    });
+  }
+
+  Future<void> setLoginStatus(bool loggedIn) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isLoggedIn', loggedIn);
+  }
+
+  final List<Map<String, dynamic>> items = [
+    {'type': 'text', 'data': 'Joshua Uys'},
+    {
+      'type': 'image',
+      'data':
+          'https://upload.wikimedia.org/wikipedia/commons/4/41/Profile-720.png',
+    },
+    {'type': 'text', 'data': 'Followers  Following'},
+    {
+      'type': 'picture',
+      'data':
+          'https://previews.123rf.com/images/happyvector071/happyvector0711904/happyvector071190414500/120957417-creative-illustration-of-default-avatar-profile-placeholder-isolated-on-background-art-design-grey.jpg',
+    },
+  ];
 }
 
 class LeaderboardItem extends StatelessWidget {
