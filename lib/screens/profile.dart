@@ -3,12 +3,71 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+//import 'package:MotiList/utils/leaderboard_widgets.dart';
+import 'package:MotiList/models/firestore_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 
 void main() {
   runApp(const ProfileScreen());
+}
+
+class CustomSearchDelegate extends SearchDelegate {
+  String selectedResult = "";
+
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = "";
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, null);
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    selectedResult = query;
+    print(selectedResult);
+
+    return Center(
+      child: Text(selectedResult),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    List<String> suggestions = [
+      // suggestions
+    ];
+
+    return ListView.builder(
+      itemCount: suggestions.length,
+      itemBuilder: (context, index) {
+        return ListTile(
+          title: Text(suggestions[index]),
+          onTap: () {
+            query = suggestions[index];
+            showResults(context);
+            print(query);
+          },
+        );
+      },
+    );
+  }
 }
 
 class ProfileScreen extends StatelessWidget {
@@ -57,9 +116,11 @@ class _MyProfileViewState extends State<MyProfileView> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // uploadProfilePhoto(photoFile, userId)
+          showSearch(
+            context: context,
+            delegate: CustomSearchDelegate(),
+          );
         },
-        tooltip: 'Search',
         child: const Icon(Icons.search),
       ),
       appBar: AppBar(

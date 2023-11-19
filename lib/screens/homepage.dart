@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
+import 'package:MotiList/models/firestore_service.dart';
 import 'profile.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,6 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
   var formattedDate = DateFormat('EEEE dd MMM').format(DateTime.now());
   var dayOffset = 0;
 
+  //temp variable for testing, points should eventually be stored in the MyUser class
+  int userPoints = 0;
+
+  FirestoreService FS = FirestoreService();
+
   List<TodoItem> get getTodoItems => todoItems;
 
   String getCurrentDay() {
@@ -59,6 +65,12 @@ class _HomeScreenState extends State<HomeScreen> {
       var newDate = DateTime.now().add(Duration(days: dayOffset));
       formattedDate = DateFormat('EEEE dd MMM').format(newDate);
       // Optionally, update other state variables if necessary
+    });
+  }
+
+  void addPoints(int points) {
+    setState(() {
+      userPoints += points;
     });
   }
 
@@ -122,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _showAddTaskBottomSheet(context);
+          FS.searchForUserByUsername("Adilling3654");
         },
         child: const Icon(Icons.add),
       ),
@@ -188,6 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ),
+                  //Text("Points: $userPoints")   this ads the points to the bottom of the category
                 ],
               ),
             );
