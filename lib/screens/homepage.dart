@@ -32,10 +32,14 @@ class MyApp extends StatelessWidget {
 }
 
 //HomeScreen state, contain all the relevent variables and UI for the home screen
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final List<TodoItem> todoItems = [];
   var formattedDate = DateFormat('EEEE dd MMM').format(DateTime.now());
   var dayOffset = 0;
+
+  late AnimationController _fadeController;
+  late Animation<double> _fadeAnimation;
 
   //temp variable for testing, points should eventually be stored in the MyUser class
   int userPoints = 0;
@@ -59,12 +63,39 @@ class _HomeScreenState extends State<HomeScreen> {
   //Updates build to add new TodoItem to the list
 
   //Updates build to update the date and tasks
+  @override
+  void initState() {
+    super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fadeAnimation =
+        Tween<double>(begin: 1.0, end: 0.0).animate(_fadeController);
+    // ... other initialization if needed ...
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    super.dispose();
+  }
+
   void updateDateAndTasks(int offset) {
-    setState(() {
+    // Start fade-out
+    _fadeController.forward().then((_) {
       dayOffset += offset;
-      var newDate = DateTime.now().add(Duration(days: dayOffset));
-      formattedDate = DateFormat('EEEE dd MMM').format(newDate);
-      // Optionally, update other state variables if necessary
+      var now = DateTime.now();
+      var newDate =
+          DateFormat('EEEE dd').format(now.add(Duration(days: dayOffset)));
+
+      // Update the date and tasks
+      setState(() {
+        formattedDate = newDate;
+      });
+
+      // Start fade-in
+      _fadeController.reverse();
     });
   }
 
@@ -94,121 +125,123 @@ class _HomeScreenState extends State<HomeScreen> {
       'Work': const Color.fromARGB(255, 33, 150, 243),
     };
     for (var item in todoList) {
-      categorizedItems[item.category]?.add(item);
+      if (item.weekDaysChecked[getCurrentDay()] ?? false) {
+        categorizedItems.putIfAbsent(item.category, () => []).add(item);
+      }
     }
-
+    var categoriesToShow = categorizedItems.entries
+        .where((entry) => entry.value.isNotEmpty)
+        .toList();
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(CupertinoIcons
-              .calendar_today), // This button returns user to today's date
-          onPressed: () {
-            // Handle button press
-            print('Button Pressed!');
-            updateDateAndTasks(-dayOffset);
-          },
-        ),
-        automaticallyImplyLeading: false,
-        //Date is animated to slide in and out when the date changes
-        title: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 150),
-          child: Text(
-            formattedDate,
-            key: ValueKey(formattedDate),
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(CupertinoIcons
+                .calendar_today), // This button returns user to today's date
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
+              // Handle button press
+              print('Button Pressed!');
+              updateDateAndTasks(-dayOffset);
             },
-            icon: const Icon(Icons.person),
           ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddTaskBottomSheet(context);
-          FS.searchForUserByUsername("Adilling3654");
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: GestureDetector(
-        //Handles swiping actions
-        onHorizontalDragEnd: (details) {
-          // The velocity is positive when the swipe direction is right to left.
-          if (details.primaryVelocity! < 0) {
-            print('Swiped Left to Right');
-            updateDateAndTasks(1);
-          } else {
-            print('Swiped Right to Left');
-            updateDateAndTasks(-1);
-            // Call the update function when the user swipes right (left to right)
-          }
-        },
-
-        child: ListView.builder(
-          padding: const EdgeInsets.all(8.0),
-          itemCount: categorizedItems.length,
-          itemBuilder: (context, index) {
-            String category = categorizedItems.entries.elementAt(index).key;
-            List<TodoItem> allItems =
-                categorizedItems.entries.elementAt(index).value;
-
-            // Filter items for the current day.
-            List<TodoItem> itemsForToday = allItems.where((item) {
-              return item.weekDaysChecked[getCurrentDay()] ?? false;
-            }).toList();
-
-            // If there are no items for today, you might want to return an empty container or some placeholder.
-
-            return Container(
-              padding: const EdgeInsets.all(8.0),
-              margin: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                color: categoryColors[
-                    category], // Assign a color to the container based on the category
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    category,
-                    style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  // Use a builder to create a list of items for today
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // to nest ListView inside another ListView
-                    itemCount: itemsForToday.length,
-                    itemBuilder: (context, itemIndex) {
-                      TodoItem item = itemsForToday[itemIndex];
-                      return TodoItem(
-                        key: ValueKey(item),
-                        text: item.text,
-                        category: item.category,
-                        categoryIcon: item.categoryIcon,
-                        description: item.description,
-                        weekDaysChecked: item.weekDaysChecked,
-                      );
-                    },
-                  ),
-                  //Text("Points: $userPoints")   this ads the points to the bottom of the category
-                ],
-              ),
-            );
-          },
+          automaticallyImplyLeading: false,
+          //Date is animated to slide in and out when the date changes
+          title: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 150),
+            child: Text(
+              formattedDate,
+              key: ValueKey(formattedDate),
+            ),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ProfileScreen()),
+                );
+              },
+              icon: const Icon(Icons.person),
+            ),
+          ],
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            _showAddTaskBottomSheet(context);
+            FS.searchForUserByUsername("Adilling3654");
+          },
+          child: const Icon(Icons.add),
+        ),
+        body: GestureDetector(
+          //Handles swiping actions
+          onHorizontalDragEnd: (details) {
+            // The velocity is positive when the swipe direction is right to left.
+            if (details.primaryVelocity! < 0) {
+              print('Swiped Left to Right');
+              updateDateAndTasks(1);
+            } else {
+              print('Swiped Right to Left');
+              updateDateAndTasks(-1);
+              // Call the update function when the user swipes right (left to right)
+            }
+          },
+
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: ListView.builder(
+              padding: const EdgeInsets.all(8.0),
+              itemCount: categoriesToShow.length,
+              itemBuilder: (context, index) {
+                String category = categoriesToShow[index].key;
+
+                // Filter items for the current day.
+                List<TodoItem> itemsForToday = categoriesToShow[index].value;
+                // If there are no items for today, you might want to return an empty container or some placeholder.
+
+                return Container(
+                  padding: const EdgeInsets.all(8.0),
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: categoryColors[
+                        category], // Assign a color to the container based on the category
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        category,
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      // Use a builder to create a list of items for today
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics:
+                            const NeverScrollableScrollPhysics(), // to nest ListView inside another ListView
+                        itemCount: itemsForToday.length,
+                        itemBuilder: (context, itemIndex) {
+                          TodoItem item = itemsForToday[itemIndex];
+                          return TodoItem(
+                            key: ValueKey(item),
+                            text: item.text,
+                            category: item.category,
+                            categoryIcon: item.categoryIcon,
+                            description: item.description,
+                            weekDaysChecked: item.weekDaysChecked,
+                          );
+                        },
+                      ),
+                      //Text("Points: $userPoints")   this ads the points to the bottom of the category
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+        ));
   }
 }
 
