@@ -221,7 +221,14 @@ class _TodoItemState extends State<TodoItem>
   }
 }
 
-const List<String> list = <String>['Fitness', 'School', 'Personal', 'Work'];
+const List<String> list = <String>[
+  'Fitness',
+  'School',
+  'Hobbies',
+  'Work',
+  'Finances',
+  'Other'
+];
 
 class DropdownButtonExample extends StatefulWidget {
   final ValueChanged<String> onValueChanged; // Added a callback

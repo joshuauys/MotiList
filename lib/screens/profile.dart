@@ -215,6 +215,9 @@ class _MyProfileViewState extends State<MyProfileView> {
             ),
           ),
           Container(
+            //Landboard background color
+            decoration:
+                const BoxDecoration(color: Color.fromARGB(255, 46, 33, 148)),
             padding: const EdgeInsets.all(16.0),
             child: const Column(
               crossAxisAlignment: CrossAxisAlignment.start,

@@ -114,15 +114,19 @@ class _HomeScreenState extends State<HomeScreen>
     Map<String, List<TodoItem>> categorizedItems = {
       'Fitness': [],
       'School': [],
-      'Personal': [],
-      'Work': []
+      'Hobbies': [],
+      'Work': [],
+      'Finances': [],
+      'Other': [],
     };
     // Define a map of category colors
     final Map<String, Color> categoryColors = {
       'Fitness': const Color.fromARGB(255, 155, 11, 226),
       'School': const Color.fromARGB(255, 255, 87, 34),
-      'Personal': const Color.fromARGB(255, 76, 175, 80),
+      'Hobbies': const Color.fromARGB(255, 76, 175, 80),
       'Work': const Color.fromARGB(255, 33, 150, 243),
+      'Finances': const Color.fromARGB(255, 1, 251, 97),
+      'Other': const Color.fromARGB(255, 247, 251, 1),
     };
     for (var item in todoList) {
       if (item.weekDaysChecked[getCurrentDay()] ?? false) {
@@ -135,6 +139,8 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
+          foregroundColor: Colors.white,
+          backgroundColor: const Color.fromARGB(255, 237, 166, 2),
           leading: IconButton(
             icon: const Icon(CupertinoIcons
                 .calendar_today), // This button returns user to today's date
@@ -175,73 +181,84 @@ class _HomeScreenState extends State<HomeScreen>
           child: const Icon(Icons.add),
         ),
         body: GestureDetector(
-          //Handles swiping actions
-          onHorizontalDragEnd: (details) {
-            // The velocity is positive when the swipe direction is right to left.
-            if (details.primaryVelocity! < 0) {
-              print('Swiped Left to Right');
-              updateDateAndTasks(1);
-            } else {
-              print('Swiped Right to Left');
-              updateDateAndTasks(-1);
-              // Call the update function when the user swipes right (left to right)
-            }
-          },
-
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8.0),
-              itemCount: categoriesToShow.length,
-              itemBuilder: (context, index) {
-                String category = categoriesToShow[index].key;
-
-                // Filter items for the current day.
-                List<TodoItem> itemsForToday = categoriesToShow[index].value;
-                // If there are no items for today, you might want to return an empty container or some placeholder.
-
-                return Container(
+            //Handles swiping actions
+            onHorizontalDragEnd: (details) {
+              // The velocity is positive when the swipe direction is right to left.
+              if (details.primaryVelocity! < 0) {
+                print('Swiped Left to Right');
+                updateDateAndTasks(1);
+              } else {
+                print('Swiped Right to Left');
+                updateDateAndTasks(-1);
+                // Call the update function when the user swipes right (left to right)
+              }
+            },
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromARGB(255, 86, 9, 194),
+                    Color.fromARGB(255, 155, 11, 226),
+                  ],
+                ),
+              ),
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: ListView.builder(
                   padding: const EdgeInsets.all(8.0),
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: categoryColors[
-                        category], // Assign a color to the container based on the category
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        category,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
+                  itemCount: categoriesToShow.length,
+                  itemBuilder: (context, index) {
+                    String category = categoriesToShow[index].key;
+
+                    // Filter items for the current day.
+                    List<TodoItem> itemsForToday =
+                        categoriesToShow[index].value;
+                    // If there are no items for today, you might want to return an empty container or some placeholder.
+
+                    return Container(
+                      padding: const EdgeInsets.all(8.0),
+                      margin: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        color: categoryColors[
+                            category], // Assign a color to the container based on the category
+                        borderRadius: BorderRadius.circular(10.0),
                       ),
-                      // Use a builder to create a list of items for today
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics:
-                            const NeverScrollableScrollPhysics(), // to nest ListView inside another ListView
-                        itemCount: itemsForToday.length,
-                        itemBuilder: (context, itemIndex) {
-                          TodoItem item = itemsForToday[itemIndex];
-                          return TodoItem(
-                            key: ValueKey(item),
-                            text: item.text,
-                            category: item.category,
-                            categoryIcon: item.categoryIcon,
-                            description: item.description,
-                            weekDaysChecked: item.weekDaysChecked,
-                          );
-                        },
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            category,
+                            style: const TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                          // Use a builder to create a list of items for today
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics:
+                                const NeverScrollableScrollPhysics(), // to nest ListView inside another ListView
+                            itemCount: itemsForToday.length,
+                            itemBuilder: (context, itemIndex) {
+                              TodoItem item = itemsForToday[itemIndex];
+                              return TodoItem(
+                                key: ValueKey(item),
+                                text: item.text,
+                                category: item.category,
+                                categoryIcon: item.categoryIcon,
+                                description: item.description,
+                                weekDaysChecked: item.weekDaysChecked,
+                              );
+                            },
+                          ),
+                          //Text("Points: $userPoints")   this ads the points to the bottom of the category
+                        ],
                       ),
-                      //Text("Points: $userPoints")   this ads the points to the bottom of the category
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ));
+                    );
+                  },
+                ),
+              ),
+            )));
   }
 }
 
