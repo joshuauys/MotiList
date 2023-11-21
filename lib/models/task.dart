@@ -10,14 +10,18 @@ class Task {
   late String description;
   late String category;
 
-///Task object
+  ///Task object
   /// @param dateTime The date and time by which a task should be completed
   /// @param title The name of a given task
   /// @param description The description of a task, currently no text limit
   /// @param category The list to which a task belong, category(s) are of a limited type
-  Task({required this.dateTime, required this.title,
-        required this.description, required this.category});
-///
+  Task(
+      {required this.dateTime,
+      required this.title,
+      required this.description,
+      required this.category});
+
+  ///
   /// Convert to map
   Map<String, dynamic> toMap() {
     return {
@@ -27,7 +31,8 @@ class Task {
       'category': category,
     };
   }
-///
+
+  ///
   ///
   static Task fromMap(Map<String, dynamic> map) {
     return Task(
@@ -37,5 +42,4 @@ class Task {
       category: map['category'],
     );
   }
-
 }
