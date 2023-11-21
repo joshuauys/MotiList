@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
@@ -67,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
     _fadeAnimation =

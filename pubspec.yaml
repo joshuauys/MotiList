@@ -38,6 +38,7 @@ dependencies:
   shared_preferences: ^2.0.12
   intl: ^0.18.1
   firebase_storage: ^11.5.1
+  confetti: ^0.7.0
 
 dev_dependencies:
   flutter_test:

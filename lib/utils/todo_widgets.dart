@@ -2,6 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
+
+late ConfettiController _confettiController;
 
 class TodoProvider extends ChangeNotifier {
   List<TodoItem> todoItems = [];
@@ -57,6 +60,17 @@ class _TodoItemState extends State<TodoItem>
     with SingleTickerProviderStateMixin {
   bool isChecked = false;
   bool isExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _confettiController =
+        ConfettiController(duration: const Duration(seconds: 10));
+
+    void playConfetti() {
+      _confettiController.play();
+    }
+  }
 
   void _editCurrentItem() async {
     final oldItem = TodoItem(
@@ -168,53 +182,80 @@ class _TodoItemState extends State<TodoItem>
         onLongPress: () {
           _editCurrentItem(); // Call the edit function on long press.
         },
-        child: ListTile(
-          tileColor:
-              isChecked ? const Color.fromARGB(255, 4, 209, 62) : Colors.grey,
-          leading: Checkbox(
-            value: isChecked,
-            activeColor: isChecked ? Colors.amber : Colors.black,
-            fillColor: MaterialStateProperty.resolveWith<Color>(
-              (Set<MaterialState> states) {
-                if (states.contains(MaterialState.selected)) {
-                  return isChecked
-                      ? const Color.fromARGB(255, 189, 9, 239)
-                      : Colors.red;
-                }
-                return Colors.grey; // Use default color when not selected
+        child: Stack(
+          children: [
+            Align(
+              widthFactor: 500,
+              alignment: Alignment.centerLeft,
+              child: ConfettiWidget(
+                confettiController: _confettiController,
+                blastDirectionality: BlastDirectionality.explosive,
+
+                shouldLoop: false,
+                numberOfParticles: 100,
+                colors: const [
+                  Colors.orange,
+                  Colors.purple
+                ], // manually specify the colors to be used
+                // createParticlePath: drawStar, // define a custom shape/path.
+              ),
+            ),
+            ListTile(
+              tileColor: isChecked
+                  ? const Color.fromARGB(255, 4, 209, 62)
+                  : Colors.grey,
+              leading: Checkbox(
+                value: isChecked,
+                activeColor: isChecked ? Colors.amber : Colors.black,
+                fillColor: MaterialStateProperty.resolveWith<Color>(
+                  (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return isChecked
+                          ? const Color.fromARGB(255, 189, 9, 239)
+                          : Colors.red;
+                    }
+                    return Colors.grey; // Use default color when not selected
+                  },
+                ),
+                onChanged: (bool? value) {
+                  if (value == true) {
+                    _confettiController = ConfettiController(
+                        duration: const Duration(seconds: 1));
+                    _confettiController.play();
+                  }
+                  setState(() {
+                    isChecked = value!;
+
+                    TextStyle(
+                        decoration: isChecked
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none);
+                  });
+                },
+              ),
+              title: Text(widget.text),
+              subtitle: AnimatedSize(
+                duration: const Duration(milliseconds: 3300),
+                //vsync: this,
+                child: isExpanded
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Description: ${widget.description}'),
+                          // Uncomment the below line to display the date.
+                          //Text('Date: ${widget.date.toLocal().toString()}'),
+                        ],
+                      )
+                    : null,
+              ),
+              trailing: Icon(widget.categoryIcon),
+              onTap: () {
+                setState(() {
+                  isExpanded = !isExpanded;
+                });
               },
             ),
-            onChanged: (bool? value) {
-              setState(() {
-                isChecked = value!;
-                TextStyle(
-                    decoration: isChecked
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none);
-              });
-            },
-          ),
-          title: Text(widget.text),
-          subtitle: AnimatedSize(
-            duration: const Duration(milliseconds: 3300),
-            //vsync: this,
-            child: isExpanded
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Description: ${widget.description}'),
-                      // Uncomment the below line to display the date.
-                      //Text('Date: ${widget.date.toLocal().toString()}'),
-                    ],
-                  )
-                : null,
-          ),
-          trailing: Icon(widget.categoryIcon),
-          onTap: () {
-            setState(() {
-              isExpanded = !isExpanded;
-            });
-          },
+          ],
         ),
       ),
     );
