@@ -193,8 +193,10 @@ class _TodoItemState extends State<TodoItem>
 
                 shouldLoop: false,
                 numberOfParticles: 100,
+
                 colors: const [
                   Colors.orange,
+                  Colors.white,
                   Colors.purple
                 ], // manually specify the colors to be used
                 // createParticlePath: drawStar, // define a custom shape/path.

@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:testmoti/screens/login_page.dart';
+import 'package:MotiList/screens/login_page.dart';
 import '../models/user.dart';
-import 'package:testmoti/models/firestore_service.dart';
+import 'package:MotiList/models/firestore_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -17,11 +17,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder<MyUser>(
-        future: firestore.initializeUser(FirebaseAuth.instance.currentUser!.uid),
+        future:
+            firestore.initializeUser(FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Loading state
-            return CircularProgressIndicator();
+            return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
             // Error state
             return Text('Error: ${snapshot.error}');
@@ -40,10 +41,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoginPage()));
+                                builder: (context) => const LoginPage()));
                       });
                     },
-                    child: Text("Logout"),
+                    child: const Text("Logout"),
                   ),
                 ],
               ),
