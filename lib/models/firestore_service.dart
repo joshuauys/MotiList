@@ -1,14 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:MotiList/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:testmoti/models/user.dart';
 
 import 'task.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<MyUser> initializeUser(String uid) async {
+    final userDoc = await _firestore.collection('users').doc(uid).get();
+    final userData = userDoc.data();
+    MyUser currentUser = MyUser(
+      uid: FirebaseAuth.instance.currentUser!.uid,
+      username: userData?['username'] as String);
+
+    return currentUser;
+  }
+
   Future<void> createTask(MyUser user, Task task) async {
-    await _firestore.collection('users').doc(user.uid).collection('tasks').add({
-      'dueDate': task.dateTime,
+    await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('tasks')
+        .add({
+      'daysOfWeek': task.daysOfWeek,
       'name': task.title,
       'description': task.description,
       'category': task.category,
@@ -22,7 +37,7 @@ class FirestoreService {
         .collection('tasks')
         .doc(taskID)
         .update({
-      'dueDate': task.dateTime,
+      'daysOfWeek': task.daysOfWeek,
       'name': task.title,
       'description': task.description,
       'category': task.category,
@@ -51,19 +66,18 @@ class FirestoreService {
     return task;
   }
 
-  Future<List<Task>> getTasksForDay(MyUser user, DateTime selectedDate) async {
+  Future<List<Task>> getTasksForDay(MyUser user, String selectedDay) async {
     try {
       final taskSnapshot = await _firestore
           .collection('users')
           .doc(user.uid)
           .collection('tasks')
-          .where('dueDate', isGreaterThanOrEqualTo: selectedDate)
-          .where('dueDate',
-              isLessThan: selectedDate.add(const Duration(days: 1)))
           .get();
 
-      final tasks =
-          taskSnapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
+      final tasks = taskSnapshot.docs
+          .map((doc) => Task.fromMap(doc.data() as Map<String, dynamic>))
+          .where((task) => task.daysOfWeek[selectedDay] == true)
+          .toList();
 
       return tasks;
     } catch (e) {
@@ -92,8 +106,7 @@ class FirestoreService {
         .set({'requesterUID': currentUser.uid});
   }
 
-  Future<void> acceptFriendRequest(
-      MyUser currentUser, MyUser friendUser) async {
+  Future<void> acceptFriendRequest(MyUser currentUser, MyUser friendUser) async {
     await _firestore
         .collection('users')
         .doc(friendUser.uid)
@@ -102,11 +115,11 @@ class FirestoreService {
         .delete();
 
     await _firestore
-        .collection('users')
-        .doc(friendUser.uid)
-        .collection('friends')
-        .doc(currentUser.uid)
-        .set({'friendUID': currentUser.uid});
+    .collection('users')
+    .doc(friendUser.uid)
+    .collection('friends')
+    .doc(currentUser.uid)
+    .set({'friendUID': currentUser.uid});
 
     await _firestore
         .collection('users')
@@ -142,18 +155,19 @@ class FirestoreService {
   }
 
   Future<List<MyUser>> getFriendRequests(MyUser user) async {
-    final friendReqSnapshot = await _firestore
+    final friendReqSnapshot =  await _firestore
         .collection('users')
         .doc(user.uid)
         .collection('friendRequests')
         .get();
 
-    final friendReqUids = friendReqSnapshot.docs.map((doc) => doc.id).toList();
+    final friendReqUids = friendReqSnapshot.docs
+        .map((doc) => doc.id)
+        .toList();
 
     // Retrieve user profiles from friendRequestUids.
-    final users = await Future.wait(
-      friendReqUids.map(
-        (uid) => _firestore.collection('users').doc(uid).get(),
+    final users = await Future.wait(friendReqUids.map(
+          (uid) => _firestore.collection('users').doc(uid).get(),
       ),
     );
 
@@ -169,17 +183,22 @@ class FirestoreService {
         .collection('friends')
         .get();
 
-    final friendUids = friendsSnapshot.docs.map((doc) => doc.id).toList();
+    final friendUids = friendsSnapshot.docs
+        .map((doc) => doc.id)
+        .toList();
 
     // Retrieve user profiles from friendUids.
-    final users = await Future.wait(
-      friendUids.map(
-        (uid) => _firestore.collection('users').doc(uid).get(),
-      ),
+    final users = await Future.wait(friendUids.map(
+          (uid) => _firestore.collection('users').doc(uid).get(),
+    ),
     );
 
     return users
         .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
+
   }
+
+
+
 }
