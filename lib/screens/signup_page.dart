@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
-
+import '../models/user.dart';
 import 'homepage.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -69,6 +69,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           email: _emailTextController.text,
                           password: _passwordTextController.text)
                       .then((value) {
+                    MyUser currentUser = MyUser(
+                        uid: value.user!.uid,
+                        username: _userNameTextController.text);
                     print("Created New Account");
                     Navigator.push(
                         context,

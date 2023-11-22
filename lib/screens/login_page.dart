@@ -6,6 +6,8 @@ import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/user.dart';
+import 'package:provider/provider.dart';
 
 import 'homepage.dart';
 
@@ -104,6 +106,10 @@ class _LoginPageState extends State<LoginPage> {
                         email: _emailTextController.text,
                         password: _passwordTextController.text)
                     .then((value) {
+                  MyUser currentUser =
+                      MyUser(uid: value.user!.uid, username: "Adilling3654");
+                  Provider.of<UserProvider>(context, listen: false)
+                      .setUser(currentUser);
                   setLoginStatus(true);
                   setState(() {
                     isLoggedIn = true;

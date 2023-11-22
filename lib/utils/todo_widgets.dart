@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:MotiList/models/task.dart';
 import 'package:confetti/confetti.dart';
 
 late ConfettiController _confettiController;
@@ -20,14 +21,14 @@ class TodoProvider extends ChangeNotifier {
 
   void deleteTodoItem(TodoItem todoItem) {
     final index =
-        todoItems.indexWhere((todoItems) => todoItems.text == todoItem.text);
+        todoItems.indexWhere((todoItems) => todoItems.title == todoItem.title);
     todoItems.remove(todoItems[index]);
     notifyListeners();
   }
 
   void updateTodoItem(TodoItem oldTodoItem, TodoItem newTodoItem) {
-    final index =
-        todoItems.indexWhere((todoItems) => todoItems.text == oldTodoItem.text);
+    final index = todoItems
+        .indexWhere((todoItems) => todoItems.title == oldTodoItem.title);
     todoItems[index] = newTodoItem;
     print(newTodoItem.weekDaysChecked);
     notifyListeners();
@@ -35,16 +36,14 @@ class TodoProvider extends ChangeNotifier {
 }
 
 class TodoItem extends StatefulWidget {
-  final String text;
-  final IconData categoryIcon;
+  final String title;
   final String description;
   final String category;
   final Map<String, bool> weekDaysChecked;
 
   const TodoItem({
     Key? key,
-    required this.text,
-    required this.categoryIcon,
+    required this.title,
     required this.description,
     required this.category,
     required this.weekDaysChecked,
@@ -74,13 +73,12 @@ class _TodoItemState extends State<TodoItem>
 
   void _editCurrentItem() async {
     final oldItem = TodoItem(
-        text: widget.text,
-        categoryIcon: Icons.category, // change this icon as needed
+        title: widget.title,
         description: widget.description,
         category: widget.category,
         weekDaysChecked: widget.weekDaysChecked);
     // Retrieving current values.
-    final currentText = widget.text;
+    final currentText = widget.title;
     final currentDescription = widget.description;
 
     String newSelectedCategory = widget.category;
@@ -137,8 +135,7 @@ class _TodoItemState extends State<TodoItem>
               child: const Text('Save'),
               onPressed: () {
                 final newItem = TodoItem(
-                  text: newText,
-                  categoryIcon: Icons.category, // change this icon as needed
+                  title: newText,
                   description: newDescription,
                   category: newSelectedCategory,
                   weekDaysChecked: widget.weekDaysChecked,
@@ -169,8 +166,7 @@ class _TodoItemState extends State<TodoItem>
       direction: DismissDirection.horizontal,
       onDismissed: (_) {
         final oldItem = TodoItem(
-            text: widget.text,
-            categoryIcon: Icons.category, // change this icon as needed
+            title: widget.title,
             description: widget.description,
             category: widget.category,
             weekDaysChecked: widget.weekDaysChecked);
@@ -235,7 +231,7 @@ class _TodoItemState extends State<TodoItem>
                   });
                 },
               ),
-              title: Text(widget.text),
+              title: Text(widget.title),
               subtitle: AnimatedSize(
                 duration: const Duration(milliseconds: 3300),
                 //vsync: this,
@@ -250,7 +246,7 @@ class _TodoItemState extends State<TodoItem>
                       )
                     : null,
               ),
-              trailing: Icon(widget.categoryIcon),
+              //trailing: Icon(widget.categoryIcon),
               onTap: () {
                 setState(() {
                   isExpanded = !isExpanded;

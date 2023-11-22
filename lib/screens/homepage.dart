@@ -1,10 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'package:MotiList/models/task.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:MotiList/models/firestore_service.dart';
 import 'profile.dart';
+import 'package:MotiList/models/task.dart';
+import '../models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -44,8 +47,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   //temp variable for testing, points should eventually be stored in the MyUser class
   int userPoints = 0;
-
-  FirestoreService FS = FirestoreService();
 
   List<TodoItem> get getTodoItems => todoItems;
 
@@ -109,7 +110,9 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     final todoProvider = Provider.of<TodoProvider>(context);
+
     List<TodoItem> todoList = todoProvider.getTodoItems;
+    FirestoreService FS = FirestoreService();
 
     // Categorizing Todo items
     Map<String, List<TodoItem>> categorizedItems = {
@@ -177,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen>
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             _showAddTaskBottomSheet(context);
-            FS.searchForUserByUsername("Adilling3654");
+            //FS.searchForUserByUsername("Adilling3654");
           },
           child: const Icon(Icons.add),
         ),
@@ -244,9 +247,8 @@ class _HomeScreenState extends State<HomeScreen>
                               TodoItem item = itemsForToday[itemIndex];
                               return TodoItem(
                                 key: ValueKey(item),
-                                text: item.text,
+                                title: item.title,
                                 category: item.category,
-                                categoryIcon: item.categoryIcon,
                                 description: item.description,
                                 weekDaysChecked: item.weekDaysChecked,
                               );
@@ -265,8 +267,14 @@ class _HomeScreenState extends State<HomeScreen>
 
 // Calling this function adds a widget to create a new TodoItem to the bottom of the screen
 void _showAddTaskBottomSheet(BuildContext context) {
+  print('Trying');
   final titleController = TextEditingController();
   final descController = TextEditingController();
+  FirestoreService FS = FirestoreService();
+
+  final userProvider = Provider.of<UserProvider>(context, listen: false);
+  final user = userProvider.currentUser;
+  print('This far');
   Map<String, bool> weekDaysChecked = {
     'Sunday': false,
     'Monday': false,
@@ -373,19 +381,18 @@ void _showAddTaskBottomSheet(BuildContext context) {
                 ElevatedButton(
                   onPressed: () {
                     final newItem = TodoItem(
-                        text: titleController.text,
-                        categoryIcon:
-                            Icons.category, // change this icon as needed
+                        title: titleController.text,
                         description: descController.text,
                         category: selectedCategory,
                         weekDaysChecked: weekDaysChecked
 
                         //onItemUpdated: (newText, newDescription) {},
                         );
-                    if (newItem.text.isNotEmpty) {
+                    if (newItem.title.isNotEmpty) {
                       Provider.of<TodoProvider>(context, listen: false)
                           .addTodoItem(newItem);
-
+                      Task newTask = FS.convertTodoItemToTask(newItem);
+                      FS.createTask(user!, newTask);
                       Navigator.of(context).pop(); // Close the bottom sheet
                     } else {
                       //Display error messages if no task name is entered

@@ -6,14 +6,14 @@ import 'screens/firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'provider.dart'; // Import your provider class
 import 'package:firebase_storage/firebase_storage.dart';
+import '../models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(ChangeNotifierProvider(
-      create: (context) => MyProvider(), child: const MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -24,6 +24,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TodoProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        // Add other providers here if needed
       ],
       child: MaterialApp(
         title: 'MotiList',

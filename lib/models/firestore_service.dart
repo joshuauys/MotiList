@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MotiList/models/user.dart';
 
@@ -15,6 +16,17 @@ class FirestoreService {
         username: userData?['username'] as String);
 
     return currentUser;
+  }
+
+//Meant to convert a TodoItem to a Task, not sure if this is the place to add it since
+//it isnt directly related to firestore, but it works for now
+  Task convertTodoItemToTask(TodoItem todoItem) {
+    return Task(
+      title: todoItem.title,
+      description: todoItem.description,
+      category: todoItem.category,
+      daysOfWeek: todoItem.weekDaysChecked,
+    );
   }
 
   Future<void> createTask(MyUser user, Task task) async {
