@@ -83,6 +83,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     Provider.of<UserProvider>(context, listen: false)
                         .setUser(currentUser);
                     print("Created New Account");
+                    value.user?.sendEmailVerification();//This line sends the email
                     Navigator.push(
                         context,
                         MaterialPageRoute(
