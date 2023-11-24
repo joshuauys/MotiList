@@ -14,6 +14,7 @@ void main() {
 }
 
 class CustomSearchDelegate extends SearchDelegate {
+  final FirestoreService FS = FirestoreService();
   String selectedResult = "";
 
   @override
@@ -42,6 +43,7 @@ class CustomSearchDelegate extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     selectedResult = query;
     print(selectedResult);
+    print(FS.searchForUserByUsername(selectedResult));
 
     return Center(
       child: Text(selectedResult),

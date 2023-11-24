@@ -267,14 +267,13 @@ class _HomeScreenState extends State<HomeScreen>
 
 // Calling this function adds a widget to create a new TodoItem to the bottom of the screen
 void _showAddTaskBottomSheet(BuildContext context) {
-  print('Trying');
   final titleController = TextEditingController();
   final descController = TextEditingController();
   FirestoreService FS = FirestoreService();
 
   final userProvider = Provider.of<UserProvider>(context, listen: false);
   final user = userProvider.currentUser;
-  print('This far');
+
   Map<String, bool> weekDaysChecked = {
     'Sunday': false,
     'Monday': false,
@@ -393,6 +392,10 @@ void _showAddTaskBottomSheet(BuildContext context) {
                           .addTodoItem(newItem);
                       Task newTask = FS.convertTodoItemToTask(newItem);
                       FS.createTask(user!, newTask);
+                      newItem.id = "test";
+                      print(FS.searchForUserByUsername("AUsernNameTest"));
+                      print(FS.getTasksForDay(user, "Thursday"));
+                      print("Task created for ${user.username}");
                       Navigator.of(context).pop(); // Close the bottom sheet
                     } else {
                       //Display error messages if no task name is entered

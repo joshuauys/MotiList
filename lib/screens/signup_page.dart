@@ -1,12 +1,14 @@
 // ignore_for_file: avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:MotiList/models/firestore_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
 import '../models/user.dart';
 import 'homepage.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -19,6 +21,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
   final TextEditingController _userNameTextController = TextEditingController();
+
+  FirestoreService FS = FirestoreService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,6 +77,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     MyUser currentUser = MyUser(
                         uid: value.user!.uid,
                         username: _userNameTextController.text);
+
+                    FS.addUsername(currentUser, _userNameTextController.text);
+                    //Future<MyUser> currentUser = FS.initializeUser(value.user!.uid);
+                    Provider.of<UserProvider>(context, listen: false)
+                        .setUser(currentUser);
                     print("Created New Account");
                     Navigator.push(
                         context,

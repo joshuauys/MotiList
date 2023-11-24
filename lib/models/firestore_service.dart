@@ -29,13 +29,27 @@ class FirestoreService {
     );
   }
 
+  Future<void> addUsername(MyUser user, String username) async {
+    await _firestore.collection('users').doc(user.uid).set({
+      'username': username, // Replace with the actual username
+    });
+  }
+
   Future<void> createTask(MyUser user, Task task) async {
-    await _firestore.collection('users').doc(user.uid).collection('tasks').add({
+    DocumentReference docRef = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('tasks')
+        .add({
       'daysOfWeek': task.daysOfWeek,
       'name': task.title,
       'description': task.description,
       'category': task.category,
     });
+
+    String taskID = docRef.id;
+    //task.id = taskID;
+    print(taskID);
   }
 
   Future<void> editTask(MyUser user, String taskID, Task task) async {
@@ -99,7 +113,7 @@ class FirestoreService {
         .where('username', isGreaterThanOrEqualTo: username)
         .where('username', isLessThanOrEqualTo: username + '\uf8ff')
         .get();
-
+    print(usernameSnapshot.docs);
     return usernameSnapshot.docs
         .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
         .toList();

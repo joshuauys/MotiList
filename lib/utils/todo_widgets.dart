@@ -36,13 +36,15 @@ class TodoProvider extends ChangeNotifier {
 }
 
 class TodoItem extends StatefulWidget {
+  String? id;
   final String title;
   final String description;
   final String category;
   final Map<String, bool> weekDaysChecked;
 
-  const TodoItem({
+  TodoItem({
     Key? key,
+    this.id,
     required this.title,
     required this.description,
     required this.category,

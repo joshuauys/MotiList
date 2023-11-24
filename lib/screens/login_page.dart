@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                         password: _passwordTextController.text)
                     .then((value) {
                   MyUser currentUser =
-                      MyUser(uid: value.user!.uid, username: "Adilling3654");
+                      MyUser(uid: value.user!.uid, username: "SomeUsername");
                   Provider.of<UserProvider>(context, listen: false)
                       .setUser(currentUser);
                   setLoginStatus(true);
