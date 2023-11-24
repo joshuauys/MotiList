@@ -79,6 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         username: _userNameTextController.text);
 
                     FS.addUsername(currentUser, _userNameTextController.text);
+                    FS.addUid(currentUser, value.user!.uid);
                     //Future<MyUser> currentUser = FS.initializeUser(value.user!.uid);
                     Provider.of<UserProvider>(context, listen: false)
                         .setUser(currentUser);

@@ -392,10 +392,7 @@ void _showAddTaskBottomSheet(BuildContext context) {
                           .addTodoItem(newItem);
                       Task newTask = FS.convertTodoItemToTask(newItem);
                       FS.createTask(user!, newTask);
-                      newItem.id = "test";
-                      print(FS.searchForUserByUsername("AUsernNameTest"));
-                      print(FS.getTasksForDay(user, "Thursday"));
-                      print("Task created for ${user.username}");
+
                       Navigator.of(context).pop(); // Close the bottom sheet
                     } else {
                       //Display error messages if no task name is entered

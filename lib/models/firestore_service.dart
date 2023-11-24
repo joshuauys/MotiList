@@ -32,7 +32,13 @@ class FirestoreService {
   Future<void> addUsername(MyUser user, String username) async {
     await _firestore.collection('users').doc(user.uid).set({
       'username': username, // Replace with the actual username
-    });
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addUid(MyUser user, String uid) async {
+    await _firestore.collection('users').doc(user.uid).set({
+      'uid': uid, // Replace with the actual username
+    }, SetOptions(merge: true));
   }
 
   Future<void> createTask(MyUser user, Task task) async {
@@ -110,13 +116,21 @@ class FirestoreService {
   Future<List<MyUser>> searchForUserByUsername(String username) async {
     final usernameSnapshot = await _firestore
         .collection('users')
-        .where('username', isGreaterThanOrEqualTo: username)
-        .where('username', isLessThanOrEqualTo: username + '\uf8ff')
+        .where('username', isGreaterThanOrEqualTo: username!)
+        .where('username', isLessThanOrEqualTo: '$username\uf8ff'!)
         .get();
-    print(usernameSnapshot.docs);
+
+    print("Usernames found: " + usernameSnapshot.docs.length.toString());
     return usernameSnapshot.docs
-        .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
+        .map((doc) => MyUser.fromMap(doc.data()))
         .toList();
+  }
+
+  Future<void> printUsernames(String username) async {
+    List<MyUser> users = await searchForUserByUsername(username);
+    for (var user in users) {
+      print("Username found: ${user.username}");
+    }
   }
 
   Future<void> sendFriendRequest(MyUser currentUser, MyUser friendUser) async {

@@ -42,8 +42,7 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     selectedResult = query;
-    print(selectedResult);
-    print(FS.searchForUserByUsername(selectedResult));
+    FS.printUsernames(selectedResult);
 
     return Center(
       child: Text(selectedResult),

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reset_password.dart';
@@ -6,6 +7,7 @@ import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:MotiList/models/firestore_service.dart';
 import '../models/user.dart';
 import 'package:provider/provider.dart';
 
@@ -43,6 +45,7 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
+  final FirestoreService FS = FirestoreService();
   String _errorMessage = "";
   @override
   Widget build(BuildContext context) {
@@ -98,18 +101,35 @@ class _LoginPageState extends State<LoginPage> {
               child: forgetPassword(context),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0), // Adjust the horizontal padding as needed
-              child: firebaseUIButton(context, "Sign In", () {
-                FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                        email: _emailTextController.text,
-                        password: _passwordTextController.text)
-                    .then((value) {
-                  MyUser currentUser =
-                      MyUser(uid: value.user!.uid, username: "SomeUsername");
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: firebaseUIButton(context, "Sign In", () async {
+                try {
+                  // Step 1: Authenticate the user
+                  UserCredential userCredential = await FirebaseAuth.instance
+                      .signInWithEmailAndPassword(
+                          email: _emailTextController.text,
+                          password: _passwordTextController.text);
+
+                  // Step 2: Get UID
+                  String uid = userCredential.user!.uid;
+
+                  // Step 3: Fetch user's data from Firestore
+                  DocumentSnapshot userDoc = await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(uid)
+                      .get();
+                  Map<String, dynamic> userData =
+                      userDoc.data() as Map<String, dynamic>;
+
+                  // Assuming 'username' is stored in the document
+                  String username = userData['username'];
+
+                  // Set user in provider
+                  MyUser currentUser = MyUser(uid: uid, username: username);
                   Provider.of<UserProvider>(context, listen: false)
                       .setUser(currentUser);
+
+                  // Proceed further
                   setLoginStatus(true);
                   setState(() {
                     isLoggedIn = true;
@@ -118,35 +138,36 @@ class _LoginPageState extends State<LoginPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const HomeScreen()));
-                }).catchError((error) {
-                  switch (error.code) {
+                } on FirebaseAuthException catch (e) {
+                  // Handle different authentication errors
+                  String errorMessage;
+                  switch (e.code) {
                     case "invalid-email":
-                      setState(() {
-                        _errorMessage =
-                            "Your email address is not formated correctly.";
-                      });
+                      errorMessage =
+                          "Your email address is not formatted correctly.";
                       break;
                     case "user-disabled":
-                      setState(() {
-                        _errorMessage = "Your account has been disabled.";
-                      });
+                      errorMessage = "Your account has been disabled.";
                       break;
                     case "user-not-found":
-                      setState(() {
-                        _errorMessage = "User with this email doesn't exist.";
-                      });
+                      errorMessage = "User with this email doesn't exist.";
                       break;
                     case "wrong-password":
-                      setState(() {
-                        _errorMessage = "Invalid password.";
-                      });
+                      errorMessage = "Invalid password.";
                       break;
                     default:
-                      setState(() {
-                        _errorMessage = "Error ${error.toString()}";
-                      });
+                      errorMessage = "Error: ${e.message}";
                   }
-                });
+                  setState(() {
+                    _errorMessage = errorMessage;
+                  });
+                } catch (e) {
+                  // Handle other errors
+                  print(e);
+                  setState(() {
+                    _errorMessage = "An error occurred. Please try again.";
+                  });
+                }
               }),
             ),
             signUpOption(),
