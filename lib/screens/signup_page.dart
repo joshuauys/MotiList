@@ -73,6 +73,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         uid: value.user!.uid,
                         username: _userNameTextController.text);
                     print("Created New Account");
+                    value.user?.sendEmailVerification();//this is the line Zach added
                     Navigator.push(
                         context,
                         MaterialPageRoute(
