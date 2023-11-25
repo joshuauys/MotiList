@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:MotiList/models/user.dart';
+import 'package:testmoti/models/user.dart';
 
+import 'leaderboard_entry.dart';
 import 'task.dart';
 
 class FirestoreService {
@@ -12,37 +12,72 @@ class FirestoreService {
     final userDoc = await _firestore.collection('users').doc(uid).get();
     final userData = userDoc.data();
     MyUser currentUser = MyUser(
-        uid: FirebaseAuth.instance.currentUser!.uid,
-        username: userData?['username'] as String);
+      uid: FirebaseAuth.instance.currentUser!.uid,
+      username: userData?['username'] as String);
 
     return currentUser;
   }
 
-//Meant to convert a TodoItem to a Task, not sure if this is the place to add it since
-//it isnt directly related to firestore, but it works for now
-  Task convertTodoItemToTask(TodoItem todoItem) {
-    return Task(
-      title: todoItem.title,
-      description: todoItem.description,
-      category: todoItem.category,
-      daysOfWeek: todoItem.weekDaysChecked,
-    );
-  }
+  Future<void> initializePoints(MyUser newUser) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('fitness')
+        .set({'points': 0});
 
-  Future<void> addUsername(MyUser user, String username) async {
-    await _firestore.collection('users').doc(user.uid).set({
-      'username': username, // Replace with the actual username
-    }, SetOptions(merge: true));
-  }
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('academic')
+        .set({'points': 0});
 
-  Future<void> addUid(MyUser user, String uid) async {
-    await _firestore.collection('users').doc(user.uid).set({
-      'uid': uid, // Replace with the actual username
-    }, SetOptions(merge: true));
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('health')
+        .set({'points': 0});
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('finance')
+        .set({'points': 0});
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('career')
+        .set({'points': 0});
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('hobbies')
+        .set({'points': 0});
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('other')
+        .set({'points': 0});
+
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(newUser.uid)
+        .collection('points')
+        .doc('all')
+        .set({'points': 0});
   }
 
   Future<void> createTask(MyUser user, Task task) async {
-    DocumentReference docRef = await _firestore
+    await _firestore
         .collection('users')
         .doc(user.uid)
         .collection('tasks')
@@ -52,10 +87,6 @@ class FirestoreService {
       'description': task.description,
       'category': task.category,
     });
-
-    String taskID = docRef.id;
-    //task.id = taskID;
-    print(taskID);
   }
 
   Future<void> editTask(MyUser user, String taskID, Task task) async {
@@ -116,21 +147,13 @@ class FirestoreService {
   Future<List<MyUser>> searchForUserByUsername(String username) async {
     final usernameSnapshot = await _firestore
         .collection('users')
-        .where('username', isGreaterThanOrEqualTo: username!)
-        .where('username', isLessThanOrEqualTo: '$username\uf8ff'!)
+        .where('username', isGreaterThanOrEqualTo: username)
+        .where('username', isLessThanOrEqualTo: username + '\uf8ff')
         .get();
 
-    print("Usernames found: " + usernameSnapshot.docs.length.toString());
     return usernameSnapshot.docs
-        .map((doc) => MyUser.fromMap(doc.data()))
+        .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
-  }
-
-  Future<void> printUsernames(String username) async {
-    List<MyUser> users = await searchForUserByUsername(username);
-    for (var user in users) {
-      print("Username found: ${user.username}");
-    }
   }
 
   Future<void> sendFriendRequest(MyUser currentUser, MyUser friendUser) async {
@@ -142,8 +165,7 @@ class FirestoreService {
         .set({'requesterUID': currentUser.uid});
   }
 
-  Future<void> acceptFriendRequest(
-      MyUser currentUser, MyUser friendUser) async {
+  Future<void> acceptFriendRequest(MyUser currentUser, MyUser friendUser) async {
     await _firestore
         .collection('users')
         .doc(friendUser.uid)
@@ -152,11 +174,11 @@ class FirestoreService {
         .delete();
 
     await _firestore
-        .collection('users')
-        .doc(friendUser.uid)
-        .collection('friends')
-        .doc(currentUser.uid)
-        .set({'friendUID': currentUser.uid});
+    .collection('users')
+    .doc(friendUser.uid)
+    .collection('friends')
+    .doc(currentUser.uid)
+    .set({'friendUID': currentUser.uid});
 
     await _firestore
         .collection('users')
@@ -192,18 +214,19 @@ class FirestoreService {
   }
 
   Future<List<MyUser>> getFriendRequests(MyUser user) async {
-    final friendReqSnapshot = await _firestore
+    final friendReqSnapshot =  await _firestore
         .collection('users')
         .doc(user.uid)
         .collection('friendRequests')
         .get();
 
-    final friendReqUids = friendReqSnapshot.docs.map((doc) => doc.id).toList();
+    final friendReqUids = friendReqSnapshot.docs
+        .map((doc) => doc.id)
+        .toList();
 
     // Retrieve user profiles from friendRequestUids.
-    final users = await Future.wait(
-      friendReqUids.map(
-        (uid) => _firestore.collection('users').doc(uid).get(),
+    final users = await Future.wait(friendReqUids.map(
+          (uid) => _firestore.collection('users').doc(uid).get(),
       ),
     );
 
@@ -219,17 +242,124 @@ class FirestoreService {
         .collection('friends')
         .get();
 
-    final friendUids = friendsSnapshot.docs.map((doc) => doc.id).toList();
+    final friendUids = friendsSnapshot.docs
+        .map((doc) => doc.id)
+        .toList();
 
     // Retrieve user profiles from friendUids.
-    final users = await Future.wait(
-      friendUids.map(
-        (uid) => _firestore.collection('users').doc(uid).get(),
-      ),
+    final users = await Future.wait(friendUids.map(
+          (uid) => _firestore.collection('users').doc(uid).get(),
+    ),
     );
 
     return users
         .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
+
   }
+
+  Future<void> updatePoints(String uid, String category) async {
+    DocumentReference categoryRef = _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('points')
+        .doc(category);
+
+    DocumentSnapshot<Map<String, dynamic>> categorySnapshot = await
+      categoryRef.get() as DocumentSnapshot<Map<String, dynamic>>;
+
+    int currentPoints = categorySnapshot.exists
+        ? (categorySnapshot.data()?['points'] as int?) ?? 0
+        : 0;
+
+    // Update points for the category
+    await categoryRef.set({'points': currentPoints + 1});
+
+    // Update 'allPoints' by fetching all category points and summing them
+    QuerySnapshot<Map<String, dynamic>> allPointsSnapshot =
+    await _firestore.collection('users').doc(uid).collection('points').get();
+
+    int allPoints = allPointsSnapshot.docs
+        .map((doc) => (doc.data()['points'] as int?) ?? 0)
+        .fold(0, (previous, current) => previous + current);
+
+    // Update 'allPoints' in the same 'points' document
+    await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('points')
+        .doc('allPoints')
+        .set({'points': allPoints});
+  }
+
+  Future<List<LeaderboardEntry>> getLeaderboard(String uid, String category) async {
+    // Fetch user's friends
+    QuerySnapshot<Map<String, dynamic>> friendsSnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('friends')
+        .get();
+
+    List<String> friendIds = friendsSnapshot.docs.map((doc) => doc.id).toList();
+
+    // Fetch current user's points for the given category
+    DocumentSnapshot<Map<String, dynamic>> currentUserPointsSnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('points')
+        .doc(category)
+        .get();
+
+    int currentUserPoints = currentUserPointsSnapshot.data()?['points'] ?? 0;
+
+    // Fetch current user's username
+    DocumentSnapshot<Map<String, dynamic>> currentUserSnapshot = await _firestore
+        .collection('users')
+        .doc(uid)
+        .get();
+
+    String currentUsername = currentUserSnapshot.data()?['username'] ?? ""; // Change 'username' to the actual field name
+
+    // Create LeaderboardEntry object for the current user
+    LeaderboardEntry currentUserEntry = LeaderboardEntry(username: currentUsername, points: currentUserPoints);
+
+    // Fetch friend points for the given category
+    List<LeaderboardEntry> friendEntries = [];
+    for (String friendId in friendIds) {
+      DocumentSnapshot<Map<String, dynamic>> friendPointsSnapshot = await _firestore
+          .collection('users')
+          .doc(friendId)
+          .collection('points')
+          .doc(category)
+          .get();
+
+      // Fetch the friend's username
+      DocumentSnapshot<Map<String, dynamic>> friendUserSnapshot = await _firestore
+          .collection('users')
+          .doc(friendId)
+          .get();
+
+      if (friendPointsSnapshot.exists && friendUserSnapshot.exists) {
+        Map<String, dynamic> pointsData = friendPointsSnapshot.data() ?? {};
+        Map<String, dynamic> userData = friendUserSnapshot.data() ?? {};
+
+        int points = pointsData['points'] ?? 0;
+        String username = userData['username'] ?? ""; // Change 'username' to the actual field name
+
+        friendEntries.add(LeaderboardEntry(username: username, points: points));
+      }
+    }
+
+    // Insert the current user's entry into the correct position in the friendEntries list
+    int currentUserIndex = friendEntries.indexWhere((entry) => entry.points < currentUserPoints);
+    if (currentUserIndex == -1) {
+      // If the current user has the highest or equal points, add to the beginning
+      friendEntries.insert(0, currentUserEntry);
+    } else {
+      friendEntries.insert(currentUserIndex, currentUserEntry);
+    }
+
+    return friendEntries;
+  }
+
 }
