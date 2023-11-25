@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -103,7 +105,7 @@ class FirestoreService {
           .get();
 
       final tasks = taskSnapshot.docs
-          .map((doc) => Task.fromMap(doc.data() as Map<String, dynamic>))
+          .map((doc) => Task.fromMap(doc.data()))
           .where((task) => task.daysOfWeek[selectedDay] == true)
           .toList();
 
@@ -116,11 +118,11 @@ class FirestoreService {
   Future<List<MyUser>> searchForUserByUsername(String username) async {
     final usernameSnapshot = await _firestore
         .collection('users')
-        .where('username', isGreaterThanOrEqualTo: username!)
-        .where('username', isLessThanOrEqualTo: '$username\uf8ff'!)
+        .where('username', isGreaterThanOrEqualTo: username)
+        .where('username', isLessThanOrEqualTo: '$username\uf8ff')
         .get();
 
-    print("Usernames found: " + usernameSnapshot.docs.length.toString());
+    print("Usernames found: ${usernameSnapshot.docs.length}");
     return usernameSnapshot.docs
         .map((doc) => MyUser.fromMap(doc.data()))
         .toList();

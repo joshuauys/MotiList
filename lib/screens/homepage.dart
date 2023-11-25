@@ -180,7 +180,6 @@ class _HomeScreenState extends State<HomeScreen>
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             _showAddTaskBottomSheet(context);
-            //FS.searchForUserByUsername("Adilling3654");
           },
           child: const Icon(Icons.add),
         ),
