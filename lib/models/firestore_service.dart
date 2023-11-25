@@ -2,8 +2,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:testmoti/models/user.dart';
-
+import 'package:MotiList/models/user.dart';
+import 'package:MotiList/utils/todo_widgets.dart';
 import 'leaderboard_entry.dart';
 import 'task.dart';
 
