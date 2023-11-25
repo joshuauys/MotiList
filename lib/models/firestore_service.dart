@@ -1,8 +1,13 @@
 // ignore_for_file: avoid_print
 
+import 'dart:js';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MotiList/models/user.dart';
+
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:provider/provider.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'leaderboard_entry.dart';
 import 'task.dart';
@@ -13,9 +18,8 @@ class FirestoreService {
   Future<MyUser> initializeUser(String uid) async {
     final userDoc = await _firestore.collection('users').doc(uid).get();
     final userData = userDoc.data();
-    MyUser currentUser = MyUser(
-        uid: FirebaseAuth.instance.currentUser!.uid,
-        username: userData?['username'] as String);
+    MyUser currentUser =
+        MyUser(uid: uid, username: userData?['username'] as String);
 
     return currentUser;
   }
@@ -78,7 +82,7 @@ class FirestoreService {
         .set({'points': 0});
   }
 
-  //Meant to convert a TodoItem to a Task, not sure if this is the place to add it since
+//Meant to convert a TodoItem to a Task, not sure if this is the place to add it since
 //it isnt directly related to firestore, but it works for now
   Task convertTodoItemToTask(TodoItem todoItem) {
     return Task(
@@ -168,21 +172,22 @@ class FirestoreService {
   Future<List<MyUser>> searchForUserByUsername(String username) async {
     final usernameSnapshot = await _firestore
         .collection('users')
-        .where('username', isGreaterThanOrEqualTo: username!)
-        .where('username', isLessThanOrEqualTo: '$username\uf8ff'!)
+        .where('username', isGreaterThanOrEqualTo: username)
+        .where('username', isLessThanOrEqualTo: '$username\uf8ff')
         .get();
 
-    print("Usernames found: " + usernameSnapshot.docs.length.toString());
     return usernameSnapshot.docs
         .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
   }
 
-  Future<void> printUsernames(String username) async {
+  Future<String> getUidfromUsername(String username) async {
     List<MyUser> users = await searchForUserByUsername(username);
+    String uid = "";
     for (var user in users) {
-      print("Username found: ${user.username}");
+      uid = user.uid;
     }
+    return uid;
   }
 
   Future<void> sendFriendRequest(MyUser currentUser, MyUser friendUser) async {
@@ -190,8 +195,28 @@ class FirestoreService {
         .collection('users')
         .doc(friendUser.uid)
         .collection('friendRequests')
-        .doc(currentUser.uid)
-        .set({'requesterUID': currentUser.uid});
+        .doc(currentUser
+            .uid) // This sets the document ID to the currentUser's UID
+        .set({
+      'requesterUID': currentUser.uid
+    }); // This stores the requester's UID
+  }
+
+  Future<void> sendFriendRequestByUsername(
+      MyUser currentUser, String username) async {
+    try {
+      String uid = await getUidfromUsername(username);
+
+      if (uid.isNotEmpty) {
+        MyUser foundUser = await initializeUser(uid);
+
+        await sendFriendRequest(currentUser, foundUser);
+      } else {
+        print("User not found.");
+      }
+    } catch (e) {
+      print("An error occurred: $e");
+    }
   }
 
   Future<void> acceptFriendRequest(
@@ -283,6 +308,34 @@ class FirestoreService {
     return users
         .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
         .toList();
+  }
+
+  Future<void> printFriendRequests(MyUser user) async {
+    final friendReqSnapshot = await _firestore
+        .collection('users')
+        .doc(user.uid)
+        .collection('friendRequests')
+        .get();
+
+    final friendReqUids = friendReqSnapshot.docs.map((doc) => doc.id).toList();
+    print(friendReqUids);
+    // Retrieve user profiles from friendRequestUids.
+    final usersSnapshots = await Future.wait(
+      friendReqUids.map(
+        (uid) => _firestore.collection('users').doc(uid).get(),
+      ),
+    );
+
+    // Convert snapshots to MyUser objects.
+    final users = usersSnapshots.map((snapshot) {
+      final data = snapshot.data();
+      return MyUser.fromMap(data!); // Assuming data is not null.
+    }).toList();
+
+    // Print the usernames.
+    for (var user in users) {
+      print('Friend request from: ${user.username}');
+    }
   }
 
   Future<void> updatePoints(String uid, String category) async {

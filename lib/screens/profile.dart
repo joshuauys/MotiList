@@ -3,11 +3,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
+import '../models/user.dart';
+import 'friend_requests.dart';
 //import 'package:MotiList/utils/leaderboard_widgets.dart';
 import 'package:MotiList/models/firestore_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const ProfileScreen());
@@ -42,7 +45,20 @@ class CustomSearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     selectedResult = query;
-    FS.printUsernames(selectedResult);
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.currentUser;
+    if (user != null) {
+      print(user.username + " sent a request to " + selectedResult);
+      FS.sendFriendRequestByUsername(user, selectedResult);
+    } else {
+      print("No current user found.");
+    }
+
+    //final userProvider = Provider.of<UserProvider>(context, listen: false);
+    //MyUser? user = userProvider.currentUser;
+    //FS.getUidfromUsername(selectedResult);
+    //MyUser foundUser = FS.initializeUser(selectedResult);
+    //FS.sendFriendRequest(user!, foundUser);
 
     return Center(
       child: Text(selectedResult),
@@ -117,6 +133,12 @@ class _MyProfileViewState extends State<MyProfileView> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
+          final FirestoreService FS = FirestoreService();
+          final userProvider =
+              Provider.of<UserProvider>(context, listen: false);
+          final user = userProvider.currentUser;
+
+          FS.printFriendRequests(user!);
           showSearch(
             context: context,
             delegate: CustomSearchDelegate(),
@@ -145,6 +167,17 @@ class _MyProfileViewState extends State<MyProfileView> {
                 print('Error during logout: $e');
                 // Handle error if needed
               }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.people),
+            alignment: Alignment.bottomCenter,
+            tooltip: 'View Friends',
+            onPressed: () async {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FriendRequestsScreen()),
+              );
             },
           ),
         ],

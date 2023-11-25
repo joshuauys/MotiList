@@ -30,6 +30,8 @@ class MyUser {
   /// @param username Username of a User
   MyUser({required this.uid, required this.username});
 
+  MyUser? get currentUser => null;
+
   Map<String, dynamic> toMap() {
     return {
       'uid': uid,
