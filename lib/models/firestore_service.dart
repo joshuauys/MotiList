@@ -179,6 +179,13 @@ class FirestoreService {
         .toList();
   }
 
+    Future<void> printUsernames(String username) async {
+    List<MyUser> users = await searchForUserByUsername(username);
+    for (var user in users) {
+      print("Username found: ${user.username}");
+    }
+  }
+
   Future<void> sendFriendRequest(MyUser currentUser, MyUser friendUser) async {
     await _firestore
         .collection('users')
