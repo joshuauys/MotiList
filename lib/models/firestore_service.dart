@@ -76,6 +76,29 @@ class FirestoreService {
         .set({'points': 0});
   }
 
+  //Meant to convert a TodoItem to a Task, not sure if this is the place to add it since
+//it isnt directly related to firestore, but it works for now
+  Task convertTodoItemToTask(TodoItem todoItem) {
+    return Task(
+      title: todoItem.title,
+      description: todoItem.description,
+      category: todoItem.category,
+      daysOfWeek: todoItem.weekDaysChecked,
+    );
+  }
+
+  Future<void> addUsername(MyUser user, String username) async {
+    await _firestore.collection('users').doc(user.uid).set({
+      'username': username, // Replace with the actual username
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addUid(MyUser user, String uid) async {
+    await _firestore.collection('users').doc(user.uid).set({
+      'uid': uid, // Replace with the actual username
+    }, SetOptions(merge: true));
+  }
+
   Future<void> createTask(MyUser user, Task task) async {
     await _firestore
         .collection('users')
