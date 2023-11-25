@@ -25,61 +25,75 @@ class FirestoreService {
   }
 
   Future<void> initializePoints(MyUser newUser) async {
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('fitness')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('academic')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('health')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('finance')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('career')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('hobbies')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('other')
         .set({'points': 0});
 
-    await FirebaseFirestore.instance
+    await _firestore
         .collection('users')
         .doc(newUser.uid)
         .collection('points')
         .doc('all')
         .set({'points': 0});
+  }
+
+  Future<void> initializeProfilePicUrl(MyUser newUser) async {
+    await _firestore.collection('users').doc(newUser.uid).set({
+      'profilePictureUrl':
+          'https://iio.azcast.arizona.edu/sites/default/files/profile-blank-whitebg.png'
+    });
+  }
+
+  Future<String?> getProfilePictureUrl(String userId) async {
+    final userDoc = await _firestore.collection('users').doc(userId).get();
+    final userData = userDoc.data();
+
+    return userData?['profilePictureUrl'] as String?;
   }
 
 //Meant to convert a TodoItem to a Task, not sure if this is the place to add it since
