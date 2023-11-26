@@ -6,7 +6,6 @@ import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:MotiList/models/firestore_service.dart';
 import 'profile.dart';
-import 'package:MotiList/models/task.dart';
 import '../models/user.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
@@ -112,24 +111,26 @@ class _HomeScreenState extends State<HomeScreen>
     final todoProvider = Provider.of<TodoProvider>(context);
 
     List<TodoItem> todoList = todoProvider.getTodoItems;
-    FirestoreService FS = FirestoreService();
+    //FirestoreService FS = FirestoreService();
 
     // Categorizing Todo items
     Map<String, List<TodoItem>> categorizedItems = {
+      'Academic': [],
+      'Career': [],
+      'Finance': [],
       'Fitness': [],
-      'School': [],
+      'Health': [],
       'Hobbies': [],
-      'Work': [],
-      'Finances': [],
       'Other': [],
     };
     // Define a map of category colors
     final Map<String, Color> categoryColors = {
+      'Academic': const Color.fromARGB(255, 255, 87, 34),
+      'Career': const Color.fromARGB(255, 33, 150, 243),
+      'Finance': const Color.fromARGB(255, 1, 251, 97),
       'Fitness': const Color.fromARGB(255, 155, 11, 226),
-      'School': const Color.fromARGB(255, 255, 87, 34),
-      'Hobbies': const Color.fromARGB(255, 76, 175, 80),
-      'Work': const Color.fromARGB(255, 33, 150, 243),
-      'Finances': const Color.fromARGB(255, 1, 251, 97),
+      'Health': const Color.fromARGB(255, 76, 175, 80),
+      'Hobbies': const Color.fromARGB(255, 6, 9, 101),
       'Other': const Color.fromARGB(255, 247, 251, 1),
     };
     for (var item in todoList) {

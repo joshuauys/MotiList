@@ -1,8 +1,9 @@
 // ignore_for_file: avoid_print
 
+import 'package:MotiList/models/firestore_service.dart';
+import 'package:MotiList/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:MotiList/models/task.dart';
 import 'package:confetti/confetti.dart';
 
 late ConfettiController _confettiController;
@@ -218,10 +219,19 @@ class _TodoItemState extends State<TodoItem>
                   },
                 ),
                 onChanged: (bool? value) {
+                  FirestoreService FS = FirestoreService();
+                  final userProvider =
+                      Provider.of<UserProvider>(context, listen: false);
+                  final userUID = userProvider.currentUser!.uid;
                   if (value == true) {
+                    FS.updatePoints(
+                        userUID, widget.category.toLowerCase(), false);
                     _confettiController = ConfettiController(
                         duration: const Duration(seconds: 1));
                     _confettiController.play();
+                  } else {
+                    FS.updatePoints(
+                        userUID, widget.category.toLowerCase(), true);
                   }
                   setState(() {
                     isChecked = value!;
@@ -263,12 +273,13 @@ class _TodoItemState extends State<TodoItem>
 }
 
 const List<String> list = <String>[
+  'Academic',
+  'Career',
+  'Finance',
   'Fitness',
-  'School',
+  'Health',
   'Hobbies',
-  'Work',
-  'Finances',
-  'Other'
+  'Other',
 ];
 
 class DropdownButtonExample extends StatefulWidget {

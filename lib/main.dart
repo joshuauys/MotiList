@@ -4,7 +4,6 @@ import 'screens/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'screens/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'provider.dart'; // Import your provider class
 import 'package:firebase_storage/firebase_storage.dart';
 import '../models/user.dart';
 

@@ -1,11 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:MotiList/models/user.dart';
-
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:provider/provider.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'leaderboard_entry.dart';
 import 'task.dart';
@@ -84,7 +80,7 @@ class FirestoreService {
     await _firestore.collection('users').doc(newUser.uid).set({
       'profilePictureUrl':
           'https://iio.azcast.arizona.edu/sites/default/files/profile-blank-whitebg.png'
-    });
+    }, SetOptions(merge: true));
   }
 
   Future<String?> getProfilePictureUrl(String userId) async {
@@ -350,7 +346,8 @@ class FirestoreService {
     }
   }
 
-  Future<void> updatePoints(String uid, String category) async {
+  Future<void> updatePoints(
+      String uid, String category, bool removePoints) async {
     DocumentReference categoryRef = _firestore
         .collection('users')
         .doc(uid)
@@ -365,7 +362,11 @@ class FirestoreService {
         : 0;
 
     // Update points for the category
-    await categoryRef.set({'points': currentPoints + 1});
+    if (removePoints) {
+      await categoryRef.set({'points': currentPoints - 1});
+    } else {
+      await categoryRef.set({'points': currentPoints + 1});
+    }
 
     // Update 'allPoints' by fetching all category points and summing them
     QuerySnapshot<Map<String, dynamic>> allPointsSnapshot = await _firestore

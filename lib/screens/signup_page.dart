@@ -80,13 +80,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                     FS.addUsername(currentUser, _userNameTextController.text);
                     FS.addUid(currentUser, value.user!.uid);
+                    print(value.user!.uid);
                     FS.initializePoints(currentUser);
                     FS.initializeProfilePicUrl(currentUser);
                     //Future<MyUser> currentUser = FS.initializeUser(value.user!.uid);
                     Provider.of<UserProvider>(context, listen: false)
                         .setUser(currentUser);
                     print("Created New Account");
-                    value.user?.sendEmailVerification();//This line sends the email
+                    value.user
+                        ?.sendEmailVerification(); //This line sends the email
                     Navigator.push(
                         context,
                         MaterialPageRoute(
