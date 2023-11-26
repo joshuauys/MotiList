@@ -48,7 +48,7 @@ class CustomSearchDelegate extends SearchDelegate {
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.currentUser;
     if (user != null) {
-      print(user.username + " sent a request to " + selectedResult);
+      print("${user.username} sent a request to $selectedResult");
       FS.sendFriendRequestByUsername(user, selectedResult);
     } else {
       print("No current user found.");
@@ -193,9 +193,9 @@ class _MyProfileViewState extends State<MyProfileView> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: items.length,
+              itemCount: getUserInfo().length,
               itemBuilder: (context, index) {
-                final item = items[index];
+                final item = getUserInfo()[index];
 
                 if (item['type'] == 'text') {
                   return ListTile(
@@ -299,8 +299,9 @@ class _MyProfileViewState extends State<MyProfileView> {
     prefs.setBool('isLoggedIn', loggedIn);
   }
 
+//deprecated
   final List<Map<String, dynamic>> items = [
-    {'type': 'text', 'data': 'Joshua Uys'},
+    {'type': 'text', 'data': "Joshua Uys"},
     {
       'type': 'image',
       'data':
@@ -313,6 +314,26 @@ class _MyProfileViewState extends State<MyProfileView> {
           'https://previews.123rf.com/images/happyvector071/happyvector0711904/happyvector071190414500/120957417-creative-illustration-of-default-avatar-profile-placeholder-isolated-on-background-art-design-grey.jpg',
     },
   ];
+
+  getUserInfo() {
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.currentUser;
+    List<Map<String, dynamic>> items = [
+      {'type': 'text', 'data': user!.username},
+      {
+        'type': 'image',
+        'data':
+            'https://upload.wikimedia.org/wikipedia/commons/4/41/Profile-720.png',
+      },
+      {'type': 'text', 'data': 'Followers  Following'},
+      {
+        'type': 'picture',
+        'data':
+            'https://previews.123rf.com/images/happyvector071/happyvector0711904/happyvector071190414500/120957417-creative-illustration-of-default-avatar-profile-placeholder-isolated-on-background-art-design-grey.jpg',
+      },
+    ];
+    return items;
+  }
 }
 
 class LeaderboardItem extends StatelessWidget {
