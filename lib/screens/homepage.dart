@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen>
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           foregroundColor: Colors.white,
-          backgroundColor: const Color.fromARGB(255, 237, 166, 2),
+          backgroundColor: Color.fromARGB(255, 2, 88, 237),
           leading: IconButton(
             icon: const Icon(CupertinoIcons
                 .calendar_today), // This button returns user to today's date
@@ -202,8 +202,8 @@ class _HomeScreenState extends State<HomeScreen>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color.fromARGB(255, 86, 9, 194),
-                    Color.fromARGB(255, 155, 11, 226),
+                    Color.fromARGB(255, 255, 255, 255),
+                    Color.fromARGB(255, 162, 162, 162),
                   ],
                 ),
               ),
