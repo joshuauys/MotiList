@@ -451,7 +451,7 @@ class FirestoreService {
         int points = pointsData['points'] ?? 0;
         String username = userData['username'] ??
             ""; // Change 'username' to the actual field name
-        print('Added Friend: $username with Points: $points');
+
         friendEntries.add(LeaderboardEntry(username: username, points: points));
       }
     }
