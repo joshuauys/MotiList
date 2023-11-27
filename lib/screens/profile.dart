@@ -110,14 +110,12 @@ class _MyProfileViewState extends State<MyProfileView> {
 
   @override
   void initState() {
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
     super.initState();
     checkLoginStatus();
     final userProvider = Provider.of<UserProvider>(context, listen: false);
     final user = userProvider.currentUser;
 
     leaderboardEntries = FS.getLeaderboard(user!.uid, 'allPoints');
-    print("Friends: " + leaderboardEntries.toString());
   }
 
   Future<String> uploadProfilePhoto(File photoFile, String userId) async {
@@ -343,11 +341,11 @@ class LeaderboardItem extends StatelessWidget {
   final int points;
 
   const LeaderboardItem({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.username,
     required this.points,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
