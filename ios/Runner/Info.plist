@@ -46,4 +46,25 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 </dict>
+<key>UIApplicationShortcutItems</key>
+<array>
+  <dict>
+    <key>UIApplicationShortcutItemIconType</key>
+    <string>UIApplicationShortcutIconTypeCompose</string>
+    <key>UIApplicationShortcutItemTitle</key>
+    <string>Action 1</string>
+    <key>UIApplicationShortcutItemType</key>
+    <string>com.example.app.action1</string>
+  </dict>
+  <dict>
+    <key>UIApplicationShortcutItemIconType</key>
+    <string>UIApplicationShortcutIconTypePlay</string>
+    <key>UIApplicationShortcutItemTitle</key>
+    <string>Action 2</string>
+    <key>UIApplicationShortcutItemType</key>
+    <string>com.example.app.action2</string>
+  </dict>
+  <!-- Add more shortcut items as needed -->
+</array>
+
 </plist>
