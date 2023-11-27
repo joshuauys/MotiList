@@ -37,13 +37,13 @@ class MyApp extends StatelessWidget {
 //HomeScreen state, contain all the relevent variables and UI for the home screen
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
-  final List<TodoItem> todoItems = [];
   var formattedDate = DateFormat('EEEE dd MMM').format(DateTime.now());
   var dayOffset = 0;
 
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
 
+  List<TodoItem> todoItems = [];
   //temp variable for testing, points should eventually be stored in the MyUser class
   int userPoints = 0;
 
@@ -67,19 +67,44 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    loadTodoItems();
     _fadeController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
     _fadeAnimation =
         Tween<double>(begin: 1.0, end: 0.0).animate(_fadeController);
-    // ... other initialization if needed ...
+    final FirestoreService FS = FirestoreService();
+    //final todoProvider = Provider.of<TodoProvider>(context);
+    //final userProvider = Provider.of<UserProvider>(context, listen: false);
+    // final List<TodoItem> NtodoItems = FS.getTasks(
+    //   userProvider.currentUser!,
+    // ) as List<TodoItem>;
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
     super.dispose();
+  }
+
+  void loadTodoItems() async {
+    final FirestoreService FS = FirestoreService();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final todoProvider = Provider.of<TodoProvider>(context, listen: false);
+
+    // Correctly load tasks and await the Future
+    List<TodoItem> loadedItems = await FS.getTasks(userProvider.currentUser!);
+    for (var item in loadedItems) {
+      print(item.title);
+    }
+    print(loadedItems.length);
+    // Update the todoProvider's list and also the local state variable
+    todoProvider.FtodoItems = loadedItems;
+
+    setState(() {
+      todoItems = loadedItems;
+    });
   }
 
   void updateDateAndTasks(int offset) {
@@ -108,9 +133,15 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    // final FirestoreService FS = FirestoreService();
     final todoProvider = Provider.of<TodoProvider>(context);
+    // final userProvider = Provider.of<UserProvider>(context, listen: false);
+    // todoProvider.todoItems = FS.getTasks(
+    //   userProvider.currentUser!,
+    // ) as List<TodoItem>;
 
-    List<TodoItem> todoList = todoProvider.getTodoItems;
+    List<TodoItem> todoList = todoProvider.FtodoItems;
+
     //FirestoreService FS = FirestoreService();
 
     // Categorizing Todo items
@@ -189,10 +220,10 @@ class _HomeScreenState extends State<HomeScreen>
             onHorizontalDragEnd: (details) {
               // The velocity is positive when the swipe direction is right to left.
               if (details.primaryVelocity! < 0) {
-                print('Swiped Left to Right');
+                //print('Swiped Left to Right');
                 updateDateAndTasks(1);
               } else {
-                print('Swiped Right to Left');
+                //print('Swiped Right to Left');
                 updateDateAndTasks(-1);
                 // Call the update function when the user swipes right (left to right)
               }

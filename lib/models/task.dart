@@ -30,11 +30,29 @@ class Task {
   ///
   static Task fromMap(Map<String, dynamic> map) {
     return Task(
-      daysOfWeek: (map['daysOfWeek'] as Map<String, dynamic>)
-          .map((key, value) => MapEntry(key, value as bool)),
-      title: map['title'],
-      description: map['description'],
-      category: map['category'],
+      // Ensure 'daysOfWeek' is not null and has the correct type
+      daysOfWeek: (map['daysOfWeek'] as Map<String, dynamic>?)
+              ?.map((key, value) => MapEntry(key, value as bool)) ??
+          {}, // Provide a default empty map if null
+
+      // Use 'as String?' to cast as a nullable String, and provide default value if null
+      title: map['name'] as String? ?? 'Default Title',
+
+      // Same nullable cast and default value for description
+      description: map['description'] as String? ?? 'No description provided',
+
+      // Same nullable cast and default value for category
+      category: map['category'] as String? ?? 'Uncategorized',
     );
   }
 }
+
+// static Task fromMap(Map<String, dynamic> map) {
+//     return Task(
+//       daysOfWeek: (map['daysOfWeek'] as Map<String, dynamic>)
+//           .map((key, value) => MapEntry(key, value as bool)),
+//       title: map['title'],
+//       description: map['description'],
+//       category: map['category'],
+//     );
+// }

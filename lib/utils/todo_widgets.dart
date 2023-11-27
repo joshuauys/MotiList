@@ -9,28 +9,28 @@ import 'package:confetti/confetti.dart';
 late ConfettiController _confettiController;
 
 class TodoProvider extends ChangeNotifier {
-  List<TodoItem> todoItems = [];
+  List<TodoItem> FtodoItems = [];
 
-  List<TodoItem> get getTodoItems => todoItems;
-  List<TodoItem> get getTodoItemsLength => todoItems;
+  List<TodoItem> get getTodoItems => FtodoItems;
+  List<TodoItem> get getTodoItemsLength => FtodoItems;
 
   void addTodoItem(TodoItem todoItem) {
-    todoItems.add(todoItem);
+    FtodoItems.add(todoItem);
     //print(todoItems.length.toString());
     notifyListeners();
   }
 
   void deleteTodoItem(TodoItem todoItem) {
     final index =
-        todoItems.indexWhere((todoItems) => todoItems.title == todoItem.title);
-    todoItems.remove(todoItems[index]);
+        FtodoItems.indexWhere((todoItems) => todoItems.title == todoItem.title);
+    FtodoItems.remove(FtodoItems[index]);
     notifyListeners();
   }
 
   void updateTodoItem(TodoItem oldTodoItem, TodoItem newTodoItem) {
-    final index = todoItems
-        .indexWhere((todoItems) => todoItems.title == oldTodoItem.title);
-    todoItems[index] = newTodoItem;
+    final index = FtodoItems.indexWhere(
+        (todoItems) => todoItems.title == oldTodoItem.title);
+    FtodoItems[index] = newTodoItem;
     print(newTodoItem.weekDaysChecked);
     notifyListeners();
   }

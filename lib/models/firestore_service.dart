@@ -101,6 +101,16 @@ class FirestoreService {
     );
   }
 
+  TodoItem convertTaskToTodoItem(Task task) {
+    return TodoItem(
+      title: task.title,
+      description: task.description,
+      category: task.category,
+      weekDaysChecked: task.daysOfWeek,
+      // other fields and initialization as required
+    );
+  }
+
   Future<void> addUsername(MyUser user, String username) async {
     await _firestore.collection('users').doc(user.uid).set({
       'username': username, // Replace with the actual username
@@ -156,6 +166,30 @@ class FirestoreService {
     final task = Task.fromMap(taskSnapshot.data() as Map<String, dynamic>);
 
     return task;
+  }
+
+  Future<List<TodoItem>> getTasks(MyUser user) async {
+    try {
+      final taskSnapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('tasks')
+          .get();
+
+      final tasks =
+          taskSnapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
+
+      // Loop through the tasks and print their titles
+      for (var task in tasks) {
+        print("Task title: ${task.title}");
+      }
+
+      // Convert each Task object to a TodoItem
+      return tasks.map((task) => convertTaskToTodoItem(task)).toList();
+    } catch (e) {
+      print("Error fetching tasks: $e");
+      return [];
+    }
   }
 
   Future<List<Task>> getTasksForDay(MyUser user, String selectedDay) async {
