@@ -1,3 +1,4 @@
+import 'package:MotiList/screens/profile.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_page.dart';
@@ -39,10 +40,10 @@ class _MyAppState extends State<MyApp> {
     quickActions.initialize((String shortcutType) {
       switch (shortcutType) {
         case 'First Page Screen':
-          _navigate('/firstpage');
+          _navigate('/homepage');
           return;
         case 'Second Page Screen':
-          _navigate('/secondpage');
+          _navigate('/profile');
           return;
         default:
           _navigate('/firstpage');
@@ -53,13 +54,13 @@ class _MyAppState extends State<MyApp> {
     quickActions.setShortcutItems(<ShortcutItem>[
       const ShortcutItem(
         type: 'First Page Screen',
-        localizedTitle: 'First Page',
-        icon: 'image1', // Replace with the actual name of your image asset
+        localizedTitle: 'Create Task',
+        icon: 'create', // Replace with the actual name of your image asset
       ),
       const ShortcutItem(
         type: 'Second Page Screen',
-        localizedTitle: 'Second Page',
-        icon: 'image1', // Replace with the actual name of your image asset
+        localizedTitle: 'View Profile',
+        icon: 'profile', // Replace with the actual name of your image asset
       ),
     ]);
   }
@@ -81,6 +82,12 @@ class _MyAppState extends State<MyApp> {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+        initialRoute: '/', // Set the initial route
+        routes: {
+          '/': (context) => const LoginPage(),
+          '/profile': (context) => const ProfileScreen(),
+          '/homepage': (context) => const ProfileScreen(),
+        },
         home: const LoginPage(),
         debugShowCheckedModeBanner: false, // Set to true in debug mode
       ),

@@ -168,11 +168,7 @@ class _HomeScreenState extends State<HomeScreen>
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const ProfileScreen()),
-                );
+                Navigator.pushNamed(context, '/profile');
               },
               icon: const Icon(Icons.person),
             ),
