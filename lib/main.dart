@@ -84,7 +84,6 @@ class _MyAppState extends State<MyApp> {
         ),
         initialRoute: '/', // Set the initial route
         routes: {
-          '/': (context) => const LoginPage(),
           '/profile': (context) => const ProfileScreen(),
           '/homepage': (context) => const ProfileScreen(),
         },
