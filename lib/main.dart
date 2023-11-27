@@ -1,3 +1,4 @@
+import 'package:MotiList/screens/profile.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_page.dart';
@@ -31,6 +32,11 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
+        initialRoute: '/', // Set the initial route
+        routes: {
+          '/profile': (context) => const ProfileScreen(),
+          '/homepage': (context) => const ProfileScreen(),
+        },
         home: const LoginPage(),
         debugShowCheckedModeBanner: false, // Set to true in debug mode
       ),
