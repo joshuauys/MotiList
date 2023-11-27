@@ -77,7 +77,6 @@ class TodoProvider extends ChangeNotifier {
 
   void addTodoItem(TodoItem todoItem) {
     todoItems.add(todoItem);
-    //print(todoItems.length.toString());
     notifyListeners();
   }
 
@@ -89,10 +88,9 @@ class TodoProvider extends ChangeNotifier {
   void updateTodoItem(TodoItem oldTodoItem, String name, TodoItem newTodoItem) {
     final index =
         todoItems.indexWhere((todoItems) => todoItems.text == oldTodoItem.text);
-    //final index = todoItems.indexOf(oldTodoItem);
+
     todoItems[index] = newTodoItem;
-    print(newTodoItem.text);
-    print(index);
+
     notifyListeners();
   }
 }
@@ -327,6 +325,7 @@ class _DropdownButtonExampleState extends State<DropdownButtonExample> {
 }
 
 //Checkbox Class for users to select what days they want to be reminded
+// ignore: must_be_immutable
 class WeekCheckbox extends StatefulWidget {
   String char = "X";
   WeekCheckbox({super.key, required this.char});

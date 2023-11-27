@@ -74,12 +74,6 @@ class _HomeScreenState extends State<HomeScreen>
     );
     _fadeAnimation =
         Tween<double>(begin: 1.0, end: 0.0).animate(_fadeController);
-    final FirestoreService FS = FirestoreService();
-    //final todoProvider = Provider.of<TodoProvider>(context);
-    //final userProvider = Provider.of<UserProvider>(context, listen: false);
-    // final List<TodoItem> NtodoItems = FS.getTasks(
-    //   userProvider.currentUser!,
-    // ) as List<TodoItem>;
   }
 
   @override
@@ -95,10 +89,7 @@ class _HomeScreenState extends State<HomeScreen>
 
     // Correctly load tasks and await the Future
     List<TodoItem> loadedItems = await FS.getTasks(userProvider.currentUser!);
-    for (var item in loadedItems) {
-      print(item.title);
-    }
-    print(loadedItems.length);
+
     // Update the todoProvider's list and also the local state variable
     todoProvider.FtodoItems = loadedItems;
 
@@ -133,16 +124,8 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    // final FirestoreService FS = FirestoreService();
     final todoProvider = Provider.of<TodoProvider>(context);
-    // final userProvider = Provider.of<UserProvider>(context, listen: false);
-    // todoProvider.todoItems = FS.getTasks(
-    //   userProvider.currentUser!,
-    // ) as List<TodoItem>;
-
     List<TodoItem> todoList = todoProvider.FtodoItems;
-
-    //FirestoreService FS = FirestoreService();
 
     // Categorizing Todo items
     Map<String, List<TodoItem>> categorizedItems = {
@@ -181,8 +164,6 @@ class _HomeScreenState extends State<HomeScreen>
             icon: const Icon(CupertinoIcons
                 .calendar_today), // This button returns user to today's date
             onPressed: () {
-              // Handle button press
-              print('Button Pressed!');
               updateDateAndTasks(-dayOffset);
             },
           ),

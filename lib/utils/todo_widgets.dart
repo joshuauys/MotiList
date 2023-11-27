@@ -36,6 +36,7 @@ class TodoProvider extends ChangeNotifier {
   }
 }
 
+// ignore: must_be_immutable
 class TodoItem extends StatefulWidget {
   String? id;
   final String title;

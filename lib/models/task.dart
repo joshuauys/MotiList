@@ -46,13 +46,3 @@ class Task {
     );
   }
 }
-
-// static Task fromMap(Map<String, dynamic> map) {
-//     return Task(
-//       daysOfWeek: (map['daysOfWeek'] as Map<String, dynamic>)
-//           .map((key, value) => MapEntry(key, value as bool)),
-//       title: map['title'],
-//       description: map['description'],
-//       category: map['category'],
-//     );
-// }

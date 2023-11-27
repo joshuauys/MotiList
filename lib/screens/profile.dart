@@ -180,7 +180,7 @@ class _MyProfileViewState extends State<MyProfileView> {
           IconButton(
             icon: const Icon(Icons.people),
             alignment: Alignment.bottomCenter,
-            tooltip: 'View Friends',
+            tooltip: 'View Friend Requests',
             onPressed: () async {
               Navigator.push(
                 context,

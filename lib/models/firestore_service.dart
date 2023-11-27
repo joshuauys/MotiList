@@ -179,11 +179,6 @@ class FirestoreService {
       final tasks =
           taskSnapshot.docs.map((doc) => Task.fromMap(doc.data())).toList();
 
-      // Loop through the tasks and print their titles
-      for (var task in tasks) {
-        print("Task title: ${task.title}");
-      }
-
       // Convert each Task object to a TodoItem
       return tasks.map((task) => convertTaskToTodoItem(task)).toList();
     } catch (e) {
