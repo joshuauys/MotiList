@@ -1,92 +1,36 @@
-import 'package:MotiList/screens/profile.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:flutter/material.dart';
 import 'screens/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'screens/firebase_options.dart';
 import 'package:provider/provider.dart';
-import 'provider.dart'; // Import your provider class
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:quick_actions/quick_actions.dart';
-
-import 'package:flutter/material.dart';
-import 'package:quick_actions/quick_actions.dart';
+import '../models/user.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  QuickActions quickActions = const QuickActions();
-
-  @override
-  void initState() {
-    initializeQuickActions();
-    super.initState();
-  }
-
-  initializeQuickActions() {
-    quickActions.initialize((String shortcutType) {
-      switch (shortcutType) {
-        case 'First Page Screen':
-          _navigate('/homepage');
-          return;
-        case 'Second Page Screen':
-          _navigate('/profile');
-          return;
-        default:
-          _navigate('/firstpage');
-          return;
-      }
-    });
-
-    quickActions.setShortcutItems(<ShortcutItem>[
-      const ShortcutItem(
-        type: 'First Page Screen',
-        localizedTitle: 'Create Task',
-        icon: 'create', // Replace with the actual name of your image asset
-      ),
-      const ShortcutItem(
-        type: 'Second Page Screen',
-        localizedTitle: 'View Profile',
-        icon: 'profile', // Replace with the actual name of your image asset
-      ),
-    ]);
-  }
-
-  _navigate(String screen) {
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
-    Navigator.pushNamed(context, screen);
-  }
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => TodoProvider()),
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+        // Add other providers here if needed
       ],
       child: MaterialApp(
         title: 'MotiList',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        initialRoute: '/', // Set the initial route
-        routes: {
-          '/profile': (context) => const ProfileScreen(),
-          '/homepage': (context) => const ProfileScreen(),
-        },
         home: const LoginPage(),
         debugShowCheckedModeBanner: false, // Set to true in debug mode
       ),
