@@ -185,7 +185,7 @@ class FirestoreService {
         .get();
 
     return usernameSnapshot.docs
-        .map((doc) => MyUser.fromMap(doc.data() as Map<String, dynamic>))
+        .map((doc) => MyUser.fromMap(doc.data()))
         .toList();
   }
 
@@ -234,6 +234,13 @@ class FirestoreService {
         .doc(friendUser.uid)
         .collection('friendRequests')
         .doc(currentUser.uid)
+        .delete();
+
+    await _firestore
+        .collection('users')
+        .doc(currentUser.uid)
+        .collection('friendRequests')
+        .doc(friendUser.uid)
         .delete();
 
     await _firestore
@@ -424,6 +431,7 @@ class FirestoreService {
     // Fetch friend points for the given category
     List<LeaderboardEntry> friendEntries = [];
     for (String friendId in friendIds) {
+      print(friendId);
       DocumentSnapshot<Map<String, dynamic>> friendPointsSnapshot =
           await _firestore
               .collection('users')
@@ -436,14 +444,14 @@ class FirestoreService {
       DocumentSnapshot<Map<String, dynamic>> friendUserSnapshot =
           await _firestore.collection('users').doc(friendId).get();
 
-      if (friendPointsSnapshot.exists && friendUserSnapshot.exists) {
+      if (friendUserSnapshot.exists) {
         Map<String, dynamic> pointsData = friendPointsSnapshot.data() ?? {};
         Map<String, dynamic> userData = friendUserSnapshot.data() ?? {};
 
         int points = pointsData['points'] ?? 0;
         String username = userData['username'] ??
             ""; // Change 'username' to the actual field name
-
+        print('Added Friend: $username with Points: $points');
         friendEntries.add(LeaderboardEntry(username: username, points: points));
       }
     }

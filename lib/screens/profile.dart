@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:MotiList/models/leaderboard_entry.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'login_page.dart';
@@ -88,7 +89,7 @@ class CustomSearchDelegate extends SearchDelegate {
 }
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -104,10 +105,19 @@ class MyProfileView extends StatefulWidget {
 class _MyProfileViewState extends State<MyProfileView> {
   bool isLoggedIn = true;
 
+  FirestoreService FS = FirestoreService();
+  late Future<List<LeaderboardEntry>> leaderboardEntries;
+
   @override
   void initState() {
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa");
     super.initState();
     checkLoginStatus();
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final user = userProvider.currentUser;
+
+    leaderboardEntries = FS.getLeaderboard(user!.uid, 'allPoints');
+    print("Friends: " + leaderboardEntries.toString());
   }
 
   Future<String> uploadProfilePhoto(File photoFile, String userId) async {
@@ -248,37 +258,28 @@ class _MyProfileViewState extends State<MyProfileView> {
               },
             ),
           ),
-          Container(
-            //Landboard background color
-            decoration:
-                const BoxDecoration(color: Color.fromARGB(255, 46, 33, 148)),
-            padding: const EdgeInsets.all(16.0),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Leaderboard',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                LeaderboardItem(
-                  imageUrl: 'assets/Thumbs2.jpg',
-                  name: 'TaskLover25',
-                  points: 100,
-                ),
-                LeaderboardItem(
-                  imageUrl: 'assets/Thumbs.jpg',
-                  name: 'DopamineDad',
-                  points: 200,
-                ),
-                LeaderboardItem(
-                  imageUrl: 'assets/Dog3.jpg',
-                  name: 'LoveMeSomeTasks',
-                  points: 150,
-                ),
-              ],
+          Expanded(
+            child: FutureBuilder<List<LeaderboardEntry>>(
+              future: leaderboardEntries,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No leaderboard entries.'));
+                } else {
+                  return ListView(
+                    children: snapshot.data!.map((LeaderboardEntry entry) {
+                      return LeaderboardItem(
+                        imageUrl: "assets/Dog3.jpg", // Replace with image URL
+                        username: entry.username,
+                        points: entry.points,
+                      );
+                    }).toList(),
+                  );
+                }
+              },
             ),
           ),
         ],
@@ -325,7 +326,7 @@ class _MyProfileViewState extends State<MyProfileView> {
         'data':
             'https://upload.wikimedia.org/wikipedia/commons/4/41/Profile-720.png',
       },
-      {'type': 'text', 'data': 'Followers  Following'},
+      {'type': 'text', 'data': 'Friends'},
       {
         'type': 'picture',
         'data':
@@ -338,13 +339,13 @@ class _MyProfileViewState extends State<MyProfileView> {
 
 class LeaderboardItem extends StatelessWidget {
   final String imageUrl;
-  final String name;
+  final String username;
   final int points;
 
   const LeaderboardItem({
     Key? key,
     required this.imageUrl,
-    required this.name,
+    required this.username,
     required this.points,
   }) : super(key: key);
 
@@ -377,7 +378,7 @@ class LeaderboardItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  username,
                   style: const TextStyle(
                     fontSize: 16.0,
                     fontWeight: FontWeight.bold,
