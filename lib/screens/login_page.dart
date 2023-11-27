@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:MotiList/utils/reset_password.dart';
@@ -7,9 +6,6 @@ import 'package:MotiList/utils/conv_color.dart';
 import 'package:MotiList/utils/register_login_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:MotiList/models/firestore_service.dart';
-import '../models/user.dart';
-import 'package:provider/provider.dart';
 
 import 'homepage.dart';
 
@@ -45,7 +41,6 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
-  final FirestoreService FS = FirestoreService();
   String _errorMessage = "";
   @override
   Widget build(BuildContext context) {
@@ -101,35 +96,14 @@ class _LoginPageState extends State<LoginPage> {
               child: forgetPassword(context),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
-              child: firebaseUIButton(context, "Sign In", () async {
-                try {
-                  // Step 1: Authenticate the user
-                  UserCredential userCredential = await FirebaseAuth.instance
-                      .signInWithEmailAndPassword(
-                          email: _emailTextController.text,
-                          password: _passwordTextController.text);
-
-                  // Step 2: Get UID
-                  String uid = userCredential.user!.uid;
-
-                  // Step 3: Fetch user's data from Firestore
-                  DocumentSnapshot userDoc = await FirebaseFirestore.instance
-                      .collection('users')
-                      .doc(uid)
-                      .get();
-                  Map<String, dynamic> userData =
-                      userDoc.data() as Map<String, dynamic>;
-
-                  // Assuming 'username' is stored in the document
-                  String username = userData['username'];
-
-                  // Set user in provider
-                  MyUser currentUser = MyUser(uid: uid, username: username);
-                  Provider.of<UserProvider>(context, listen: false)
-                      .setUser(currentUser);
-
-                  // Proceed further
+              padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0), // Adjust the horizontal padding as needed
+              child: firebaseUIButton(context, "Sign In", () {
+                FirebaseAuth.instance
+                    .signInWithEmailAndPassword(
+                        email: _emailTextController.text,
+                        password: _passwordTextController.text)
+                    .then((value) {
                   setLoginStatus(true);
                   setState(() {
                     isLoggedIn = true;
@@ -138,36 +112,35 @@ class _LoginPageState extends State<LoginPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const HomeScreen()));
-                } on FirebaseAuthException catch (e) {
-                  // Handle different authentication errors
-                  String errorMessage;
-                  switch (e.code) {
+                }).catchError((error) {
+                  switch (error.code) {
                     case "invalid-email":
-                      errorMessage =
-                          "Your email address is not formatted correctly.";
+                      setState(() {
+                        _errorMessage =
+                            "Your email address is not formated correctly.";
+                      });
                       break;
                     case "user-disabled":
-                      errorMessage = "Your account has been disabled.";
+                      setState(() {
+                        _errorMessage = "Your account has been disabled.";
+                      });
                       break;
                     case "user-not-found":
-                      errorMessage = "User with this email doesn't exist.";
+                      setState(() {
+                        _errorMessage = "User with this email doesn't exist.";
+                      });
                       break;
                     case "wrong-password":
-                      errorMessage = "Invalid password.";
+                      setState(() {
+                        _errorMessage = "Invalid password.";
+                      });
                       break;
                     default:
-                      errorMessage = "Error: ${e.message}";
+                      setState(() {
+                        _errorMessage = "Error ${error.toString()}";
+                      });
                   }
-                  setState(() {
-                    _errorMessage = errorMessage;
-                  });
-                } catch (e) {
-                  // Handle other errors
-                  print(e);
-                  setState(() {
-                    _errorMessage = "An error occurred. Please try again.";
-                  });
-                }
+                });
               }),
             ),
             signUpOption(),

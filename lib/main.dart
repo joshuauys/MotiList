@@ -1,3 +1,4 @@
+import 'package:MotiList/screens/homepage.dart';
 import 'package:MotiList/screens/profile.dart';
 import 'package:MotiList/utils/todo_widgets.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +86,7 @@ class _MyAppState extends State<MyApp> {
         initialRoute: '/', // Set the initial route
         routes: {
           '/profile': (context) => const ProfileScreen(),
-          '/homepage': (context) => const ProfileScreen(),
+          '/homepage': (context) => const HomeScreen(),
         },
         home: const LoginPage(),
         debugShowCheckedModeBanner: false, // Set to true in debug mode
