@@ -244,7 +244,8 @@ class _TodoItemState extends State<TodoItem>
                   });
                 },
               ),
-              title: Text(widget.title),
+              title: Text(widget.title, style: const TextStyle(fontSize: 15)),
+
               subtitle: AnimatedSize(
                 duration: const Duration(milliseconds: 3300),
                 //vsync: this,

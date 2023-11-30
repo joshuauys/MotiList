@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen>
       'Finance': const Color.fromARGB(255, 1, 251, 97),
       'Fitness': const Color.fromARGB(255, 155, 11, 226),
       'Health': const Color.fromARGB(255, 76, 175, 80),
-      'Hobbies': const Color.fromARGB(255, 6, 9, 101),
+      'Hobbies': const Color.fromARGB(255, 3, 11, 249),
       'Other': const Color.fromARGB(255, 247, 251, 1),
     };
     for (var item in todoList) {
@@ -247,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen>
                           Text(
                             category,
                             style: const TextStyle(
-                                fontSize: 20, fontWeight: FontWeight.bold),
+                                fontSize: 25, fontWeight: FontWeight.bold),
                           ),
                           // Use a builder to create a list of items for today
                           ListView.builder(
@@ -296,7 +296,7 @@ void _showAddTaskBottomSheet(BuildContext context) {
     'Saturday': false,
   };
   String errortext = '';
-  String selectedCategory = 'Fitness'; // Assume 'Default' is a valid option
+  String selectedCategory = 'Academic'; // Assume 'Default' is a valid option
 
   showModalBottomSheet(
     context: context,
