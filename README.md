@@ -22,3 +22,9 @@ Ensure you have Flutter installed and set up.
 Navigate to the project directory and run flutter pub get to install dependencies.
 Launch an emulator or connect a device.
 Run flutter run to start the app.
+
+![Screenshot__271_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/dc30b155-a6bb-42be-8d1e-a3de9c1669ef)
+![Screenshot__270_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/cfd862dc-419c-4736-adfc-d5e151f10b81)
+![Screenshot__268_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/eaa67f20-69a3-4101-9f4b-71f7fe7adcee)
+![Screenshot__269_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/44726304-7256-4d20-956e-624c33b1b689)
+![Screenshot__266_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/946cc59e-4542-47f6-ac0c-f6e1dca0d743)
