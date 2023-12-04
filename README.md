@@ -28,3 +28,6 @@ Run flutter run to start the app.
 ![Screenshot__268_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/eaa67f20-69a3-4101-9f4b-71f7fe7adcee)
 ![Screenshot__269_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/44726304-7256-4d20-956e-624c33b1b689)
 ![Screenshot__266_-removebg-preview](https://github.com/joshuauys/MotiList/assets/42970227/946cc59e-4542-47f6-ac0c-f6e1dca0d743)
+
+
+![Poster](https://github.com/joshuauys/MotiList/assets/42970227/8aecf031-26a6-4a1e-a672-d53063107313)
